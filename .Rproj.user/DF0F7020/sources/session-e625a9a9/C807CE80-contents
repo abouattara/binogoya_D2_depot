@@ -1,0 +1,395 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
+# Registre annuel des requêtes et contrôles de qualité des données – 2026
+
+**Projet :** suivi de cohorte et enquête transversale  
+**Responsabilité dans le projet :** Data Manager  
+**Étiquette professionnelle utilisée dans les échanges :** Lead Data Engineer  
+**Période d’archivage :** 2026  
+**Sources :** archives de messages partagées et éléments de suivi communiqués dans la conversation jusqu’au 23 novembre 2026.
+
+---
+
+## 1. Objet du document
+
+Ce document centralise les demandes de vérification, anomalies signalées, incohérences de parcours, doublons, demandes de correction et éléments de suivi transmis aux équipes de terrain en 2026.
+
+Le classement est effectué **par site** afin de faciliter le suivi avec les équipes concernées. Les anomalies de l’enquête transversale sont regroupées séparément par site d’enquête et par enquêteur.
+
+Ce registre constitue une trace des contrôles et sollicitations effectués. Il ne vaut pas preuve que chaque anomalie a été corrigée.
+
+## 2. Règles de lecture et précautions
+
+- Les dates des messages dans les archives sont généralement indiquées sans année. Conformément à la demande d’archivage, elles sont rattachées à l’année **2026**.
+- Les dates de collecte ou de visite mentionnées dans les anomalies sont conservées telles qu’elles apparaissent dans les archives. Certaines concernent explicitement 2025.
+- Les identifiants sont reproduits autant que possible avec leurs préfixes de site. Pour l’enquête transversale, les zéros initiaux sont conservés lorsqu’ils sont présents dans les échanges.
+- Les formulations « absent de la base précédente » ou « incohérence du parcours » décrivent un écart entre les bases consultées. Elles ne permettent pas, à elles seules, de conclure à une perte de vue.
+- Les doublons signalés doivent être contrôlés dans les formulaires et dans les bases sources avant toute suppression.
+- Lorsqu’aucun retour ou aucune correction n’est explicitement documenté dans les archives consultées, le statut est indiqué **« retour non documenté dans les archives »**.
+- Certains identifiants apparaissent dans plusieurs messages à des dates différentes. Ils sont regroupés dans les rubriques correspondantes, en conservant les dates de signalement lorsque cela est utile.
+
+## 3. Synthèse des domaines de contrôle
+
+Les requêtes archivées portent principalement sur :
+
+1. **Contrôle des doublons** dans les bases d’inclusion, d’accouchement, de post-partum et de suivi mensuel.
+2. **Vérification de la continuité du parcours de suivi** entre inclusion, accouchement, post-partum et visites M2 à M6.
+3. **Contrôle des dates** : inclusion, accouchement, visite, dernières règles et dates de suivi.
+4. **Contrôle des valeurs aberrantes** : âge gestationnel, poids, taille, nombre d’enfants, années de mariage, frais de transport et nombre de personnes contributrices.
+5. **Vérification des données de vaccination**, notamment l’ordre chronologique Q88 → Q89 → Q90 → Q91.
+6. **Complétude des formulaires** et clarification de certaines questions du questionnaire.
+7. **Complétude des informations biologiques**, notamment les résultats de charge virale à M6.
+
+---
+
+# 4. Registre détaillé par site
+
+## 4.1. Site de Goughin (GOU)
+
+### 4.1.1. Doublons signalés
+
+| Date du signalement (2026) | Base concernée | Identifiant(s) | Observation |
+|---|---|---|---|
+| 23/03 | `mois2Data` | GOU012 | Identifiant en double. |
+| 23/03 | `mois6Data` | GOU012 | Identifiant en double. |
+| 23/03 | `partageStatuData` | GOU050, GOU038, GOU036, GOU011, GOU022, GOU028, GOU031, GOU041, GOU002, GOU010, GOU021, GOU025, GOU030, GOU023, GOU029, GOU035, GOU042, GOU034, GOU032, GOU061, GOU008, GOU018, GOU052, GOU057, GOU006, GOU020, GOU026, GOU054, GOU060, GOU059, GOU027, GOU067, GOU064, GOU078, GOU063, GOU074, GOU070 | Série d’identifiants signalés en double dans la base de partage de statut. |
+| 21/08 et 31/08 | `mois6Data` | GOU050, GOU040 | Doublons signalés à plusieurs reprises. |
+| 31/08 | `mois2Data` | GOU089 | Identifiant en double. |
+| 31/08 | `mois3Data` | GOU088 | Identifiant en double. |
+| 21/09 | `accouchementData` | GOU046 | Identifiant en double. |
+| 21/09 | `postPartoumData` | GOU046 | Identifiant en double. |
+| 21/09 | `mois2Data` | GOU089 | Doublon signalé à nouveau. |
+| 21/09 | `mois3Data` | GOU086 | Identifiant en double. |
+| 02/10 et 06/11 | `mois6Data` / suivi M6 | GOU040 | Doublon signalé dans le suivi M6. |
+| 06/11 | `accouchementData` | GOU065 | Identifiant en double. |
+| 06/11 | `postPartoumData` | GOU065 | Identifiant en double. |
+
+### 4.1.2. Incohérences de parcours entre les visites
+
+| Date(s) du signalement (2026) | Écart observé | Identifiant(s) | Commentaire / demande |
+|---|---|---|---|
+| 17/04, 21/09, 26/10 | M3 vus, absents du M2 | GOU019, GOU086 | Vérifier si la visite M2 a été manquée, non saisie ou enregistrée sous un autre identifiant. GOU019 a été cité comme exemple de visite complètement manquée. |
+| 17/04, 08/06, 21/09, 02/10, 13/10, 26/10 | M4 vus, absents du M3 | GOU047, GOU024, GOU030 | Vérifier la continuité du suivi et les éventuelles visites manquées. GOU047 et GOU030 sont repris dans plusieurs points de suivi. |
+| 08/06, 21/09, 02/10, 13/10, 26/10, 06/11 | M2 vus, absents du post-partum | GOU065, GOU073, GOU085 | Vérifier les dossiers et confirmer la situation des visites post-partum. |
+| 21/09, 02/10, 13/10 | M6 vus, absents du M4 | GOU040, GOU056 | Vérifier le parcours de suivi. GOU040 a fait l’objet d’une clarification spécifique (voir ci-dessous). |
+| 06/11 | M2 vu, absent du post-partum | GOU085 | Identifiant repris dans le dernier point de suivi disponible. |
+| 06/11 | M3 vu, absent du M2 | GOU086 | Identifiant repris dans le dernier point de suivi disponible. |
+| 06/11 | M4 vu, absent du M3 | GOU047 | Identifiant repris dans le dernier point de suivi disponible. |
+
+### 4.1.3. Clarification du cas GOU040
+
+Le 21/09, GOU040 était signalé comme doublon en M6 et comme identifiant présent en M6 mais absent du M4.
+
+Le 23/09, une précision a été communiquée : un formulaire M6 avait été enregistré le **13 août à 08 h 38**, puis un formulaire M4 le **13 août à 08 h 39**. Il a été indiqué qu’il n’était pas possible de transformer directement le formulaire M6 en M4. La solution proposée était de supprimer le formulaire M6 erroné, puis de saisir correctement le formulaire M4.
+
+**Statut dans les archives :** une solution de correction a été proposée, mais la réalisation effective de la suppression et de la nouvelle saisie n’est pas confirmée.
+
+### 4.1.4. Résultats de charge virale à M6
+
+| Identifiant | Résultat communiqué | Information complémentaire attendue |
+|---|---|---|
+| GOU016-E | Indétectable | Date de l’examen à préciser. |
+| GOU027-E | Indétectable | Date de l’examen à préciser. |
+| GOU049-E | Détectable | Date de l’examen à préciser. |
+| GOU051-E | Détectable | Date et valeur de l’examen à préciser. |
+
+**Point de contrôle :** compléter les dates d’examen et, pour GOU051-E, la valeur de la charge virale.
+
+### 4.1.5. Informations de suivi de terrain
+
+Le 17/03, un retour concernant le site de Goughin 7 a été annoncé, mais le détail de ce retour n’apparaît pas dans l’extrait d’archive consulté.
+
+---
+
+## 4.2. Site de Ziniaré (ZIN)
+
+### 4.2.1. Doublons signalés
+
+| Date du signalement (2026) | Base concernée | Identifiant(s) | Observation |
+|---|---|---|---|
+| 13/04 et 17/04 | `mois4Data` | ZIN062 | Doublon signalé à deux reprises. |
+| 11/05 | `accouchementData` | ZIN100 | Identifiant en double ; un retour sur le dossier a été demandé. |
+| 26/10 et 06/11 | `mois2Data` | ZIN142 | Identifiant en double. |
+| 26/10 | `mois2Data` | ZIN154 | Identifiant en double. |
+| 26/10 et 06/11 | `mois3Data` | ZIN142 | Identifiant en double. |
+
+### 4.2.2. Incohérences de parcours entre les visites
+
+| Date(s) du signalement (2026) | Écart observé | Identifiant(s) | Commentaire / demande |
+|---|---|---|---|
+| 13/04 et 17/04 | Post-partum vu, absent de l’accouchement | ZIN120 | Vérifier la présence du formulaire d’accouchement ou l’identifiant utilisé. |
+| 13/04, 17/04, 26/10 | M2 vu, absent du post-partum | ZIN022, ZIN157 | ZIN022 signalé en avril ; ZIN157 signalé en octobre. |
+| 17/04, 13/10 | M3 vus, absents du M2 | ZIN024, ZIN044 | Vérifier si les visites M2 ont été manquées ou non saisies. |
+| 17/04 | M3 vu, absent du M2 | ZIN017 | Signalement initial d’avril. |
+| 02/10, 13/10, 06/11 | Post-partum et/ou M2/M3/M4/M6 présents, mais absence dans `accouchementData` | ZIN091, ZIN142 | Vérifier la base d’accouchement, l’identifiant et la cohérence du parcours. |
+| 13/10 et 26/10 | M4 vu, absent du M3 | ZIN109 | Vérifier la visite M3 ou une éventuelle erreur d’identifiant. |
+| 06/11 | Présent en post-partum, M2, M3, M4 et M6, absent de la base accouchement | ZIN091 | Incohérence de parcours récapitulée dans le dernier point de suivi. |
+
+### 4.2.3. Informations de suivi de terrain
+
+Un retour du 17/03 mentionne les situations suivantes :
+
+- **ZIN013, ZIN015 et ZIN019 :** participantes injoignables.
+- **ZIN061 :** a accouché, puis a quitté son foyer pour retourner dans sa famille.
+- **ZIN122 :** n’avait pas encore accouché au moment du retour.
+- **ZIN053, ZIN055, ZIN060, ZIN064, ZIN065, ZIN077, ZIN087, ZIN091, ZIN095, ZIN104 et ZIN105 :** participantes annoncées en déplacement ; l’équipe indiquait être en contact avec elles et attendre leur retour.
+
+**Précaution :** ces informations décrivent la situation rapportée à la date du message. Elles ne constituent pas une mise à jour actuelle du statut des participantes.
+
+---
+
+## 4.3. Site de Lafiabougou (LAF)
+
+### 4.3.1. Doublons signalés
+
+| Date du signalement (2026) | Base concernée | Identifiant(s) | Observation |
+|---|---|---|---|
+| 17/04 | `mois3Data` | LAF011 | Identifiant en double. |
+| 09/09 | `accouchementData` | LAF118 | Identifiant en double. |
+| 26/10 | `mois4Data` | LAF121 | Identifiant en double. |
+
+### 4.3.2. Incohérences de parcours entre les visites
+
+| Date(s) du signalement (2026) | Écart observé | Identifiant(s) | Commentaire / demande |
+|---|---|---|---|
+| 17/04 | M2 vus, absents du post-partum | LAF008, LAF022, LAF005, LAF018, LAF042, LAF033, LAF028, LAF014 | Vérifier les formulaires post-partum ou les identifiants. |
+| 17/04 | M3 vus, absents du M2 | LAF039, LAF038, LAF054 | Vérifier les visites M2 correspondantes. |
+
+### 4.3.3. Vérification des âges gestationnels
+
+| Date(s) du signalement (2026) | Identifiant | Valeur signalée | Vérification demandée |
+|---|---|---:|---|
+| 19/03 et 11/05 | LAF099 | 78,0 semaines | Confirmer l’âge gestationnel renseigné. |
+| 19/03 | LAF063 | 62,0 semaines | Confirmer l’âge gestationnel renseigné. |
+| 11/05 | LAF066 | 41,0 semaines | Confirmer l’âge gestationnel renseigné. |
+
+### 4.3.4. Dates de suivi et dossiers à compléter
+
+| Date du signalement (2026) | Identifiant | Constat | Action demandée |
+|---|---|---|---|
+| 17/08 | LAF016 | Deux dates de suivi sont indiquées : 11/07/2025 et 13/07/2025. | Vérifier les formulaires et confirmer la date à retenir. |
+| 17/08 | LAF026 | Date de suivi renseignée : 14/05/2025. | Vérifier et confirmer l’exactitude de la date. |
+| 17/08 | LAF113 | Aucun suivi ultérieur ne semble enregistré. | Vérifier la situation de la participante et confirmer, si possible, si elle est perdue de vue. |
+| 17/08 | LAF116 | Suivi du 27/02/2026 annoncé comme non saisi. | Saisir le suivi correspondant. |
+| 17/08 | LAF122 | Suivi du 04/03/2026 annoncé comme non saisi. | Saisir le suivi correspondant. |
+
+### 4.3.5. Informations de suivi de terrain
+
+Le 17/03, les situations suivantes ont été rapportées :
+
+- **LAF020 :** fausse couche signalée.
+- **LAF032 :** contactée ; aurait eu un enfant mort-né.
+- **LAF044, LAF074 et LAF057 :** refus de poursuivre le suivi.
+- **LAF100 :** n’avait pas encore accouché et était toujours suivie.
+- **LAF016, LAF036 et LAF025 :** parties accoucher au village ; aucun retour n’était encore signalé au moment du message.
+
+Ces éléments sont des retours de terrain datés du 17/03 et doivent être actualisés avant toute interprétation de la situation actuelle.
+
+---
+
+## 4.4. Site de Farakan (FAR)
+
+### 4.4.1. Incohérences de parcours
+
+| Date du signalement (2026) | Écart observé | Identifiant(s) | Commentaire / demande |
+|---|---|---|---|
+| 17/04 | M3 vus, absents du M2 | FAR003, FAR025 | Vérifier si les visites M2 ont été manquées ou non saisies. |
+| 21/08 | Vue à l’accouchement, absente de l’inclusion | FAR118 | Vérifier l’existence du formulaire d’inclusion ou une erreur d’identifiant. |
+
+### 4.4.2. Vérification des dates et des visites
+
+| Date du signalement (2026) | Identifiant | Constat | Action demandée |
+|---|---|---|---|
+| 17/08 | FAR010 | Date d’inclusion renseignée au 19/05/2025 ; comparaison faite avec FAR011, incluse le 07/04/2025. | Vérifier et confirmer la date exacte d’inclusion. |
+| 17/08 | FAR004 | Date d’accouchement : 09/05/2025 ; date de visite : 08/05/2025. | Vérifier les deux dates et confirmer les dates correctes. |
+| 17/08 | FAR009 | Deux suivis enregistrés dans le même mois : 02/05/2025 et 06/05/2025. | Vérifier les formulaires et préciser le suivi à retenir. |
+| 17/08 | FAR010 | Date d’inclusion et date de suivi toutes deux renseignées au 19/05/2025. | Vérifier les formulaires et confirmer si les dates sont exactes ou s’il s’agit d’une erreur de saisie. |
+
+### 4.4.3. Valeur de poids à vérifier
+
+| Date du signalement (2026) | Identifiant | Valeur signalée | Action demandée |
+|---|---|---:|---|
+| 19/03 | FAR059 | 3,9 (unité non précisée dans le message) | Vérifier le poids dans le formulaire source et confirmer l’unité et la valeur. |
+
+### 4.4.4. Informations de suivi de terrain
+
+Le 17/03, aucun détail spécifique de retour d’accouchement pour Farakan n’apparaît dans l’extrait d’archive, hormis le nom du site mentionné dans le point initial.
+
+---
+
+# 5. Enquête transversale – anomalies regroupées par site d’enquête
+
+Les identifiants de cette section sont ceux de l’enquête transversale. Les codes enquêteurs et les sites sont repris des archives.
+
+## 5.1. Goughin – enquêteur 01 et enquêteur 05
+
+### Enquêteur 01 – AZON Fréjus
+
+| Date du signalement (2026) | Identifiant | Variable / question | Valeur signalée | Contrôle demandé |
+|---|---|---|---|---|
+| 21/09 | 01303 | Âge au premier rapport | 10 ans | Vérifier la valeur dans le questionnaire source. |
+| 30/09 | 01302, 01305, 01307, 01313, 01312, 01316, 01318, 01320, 01321, 01328, 01333, 01332, 01334, 01336, 01337, 01339, 01344 | Q88, Q89, Q90, Q91 | Chronologie des vaccinations signalée comme incohérente. | Vérifier l’ordre chronologique et les dates renseignées de Q88 à Q91. |
+
+Détail des dates de vaccination reproduites dans l’archive (ordre Q88 → Q89 → Q90 → Q91) :
+
+| ID | Q88 | Q89 | Q90 | Q91 |
+|---|---|---|---|---|
+| 01302 | 14/09 | 14/09 | — | — |
+| 01305 | 09/07 | 09/07 | 16/09 | — |
+| 01307 | 06/07 | 06/07 | 16/09 | — |
+| 01313 | 16/07 | 16/07 | 21/08 | Oui |
+| 01312 | 18/06 | 18/06 | 17/07 | Oui |
+| 01316 | 19/06 | 19/06 | 20/07 | Oui |
+| 01318 | 11/09 | 11/09 | — | — |
+| 01320 | 21/07 | 21/07 | 22/09 | — |
+| 01321 | 23/07 | 23/07 | 22/09 | — |
+| 01328 | 25/06 | 25/06 | 27/08 | Oui |
+| 01333 | 07/08 | 07/08 | 11/09 | — |
+| 01332 | 22/08 | 22/08 | 25/09 | — |
+| 01334 | 05/09 | 05/09 | — | — |
+| 01336 | 27/06 | 27/06 | 27/08 | Oui |
+| 01337 | 14/09 | 14/09 | — | — |
+| 01339 | 30/06 | 30/06 | 31/08 | Oui |
+| 01344 | 24/08 | 24/08 | — | — |
+
+### Enquêtrice 05 – OUEDRAOGO Adjaratou
+
+| Date du signalement (2026) | Identifiant | Variable / question | Valeur signalée | Contrôle demandé |
+|---|---|---|---|---|
+| 30/09 | 01309, 01311, 01315, 01314, 01317, 01319, 01325, 01326, 01327, 01330, 01329, 01335, 01338, 01340, 01345, 01343 | Q88, Q89, Q90, Q91 | Chronologie des vaccinations signalée comme incohérente. | Vérifier l’ordre chronologique et les dates renseignées de Q88 à Q91. |
+
+Détail des dates de vaccination reproduites dans l’archive (ordre Q88 → Q89 → Q90 → Q91) :
+
+| ID | Q88 | Q89 | Q90 | Q91 |
+|---|---|---|---|---|
+| 01309 | 17/06 | 17/06 | 17/08 | Oui |
+| 01311 | 17/06 | 17/06 | 17/08 | Oui |
+| 01315 | 20/06 | 20/06 | 20/08 | — |
+| 01314 | 19/06 | 19/06 | 19/08 | Oui |
+| 01317 | 27/07 | 27/07 | 24/08 | Oui |
+| 01319 | 19/07 | 19/07 | 21/09 | — |
+| 01325 | 22/07 | 22/07 | 23/09 | — |
+| 01326 | 23/07 | 23/07 | 23/09 | — |
+| 01327 | 23/06 | 23/06 | 24/08 | Oui |
+| 01330 | 26/06 | 26/06 | 30/07 | Oui |
+| 01329 | 24/06 | 24/06 | 24/08 | Oui |
+| 01335 | 30/08 | 30/08 | — | — |
+| 01338 | 27/07 | 27/07 | 28/09 | — |
+| 01340 | 30/09 | 30/06 | 28/08 | Oui – anomalie explicitement signalée |
+| 01345 | 16/09 | 16/09 | — | — |
+| 01343 | 28/07 | 28/07 | 29/09 | — |
+
+**Point particulier :** pour l’ID 01340, la séquence de dates telle que retranscrite dans l’archive est 30/09 → 30/06 → 28/08. Elle a été signalée comme anomalie. Les valeurs doivent être vérifiées dans les formulaires sources avant correction.
+
+## 5.2. Ziniaré – enquêtrice 02
+
+### Enquêtrice 02 – SORE Salamata
+
+| Date du signalement (2026) | Identifiant | Variable / question | Valeur signalée | Contrôle demandé |
+|---|---|---|---|---|
+| 21/09 | 02324 | Q45_1 – Date des dernières règles | 15/01/2026 alors que la femme venait d’accoucher | Vérifier la date dans le questionnaire source. |
+| 30/09 | 02340 | Nombre de personnes contributrices | 1 000 | Vérifier la valeur et son unité/contexte. |
+| 12/10 | 02352 | Q45_1 – Date des dernières règles | 01/12/2026 alors que la femme venait d’accoucher | Vérifier la date et la cohérence avec la date d’accouchement. |
+
+## 5.3. Lafiabougou – enquêtrice 03
+
+### Enquêtrice 03 – OUEDRAOGO Aminata
+
+| Date du signalement (2026) | Identifiant | Variable / question | Valeur signalée | Contrôle demandé |
+|---|---|---|---|---|
+| 21/09 | 03319 | Q45_1 – Date des dernières règles | 05/01/2026 alors que la femme venait d’accoucher | Vérifier la date dans le questionnaire source. |
+| 21/09 | 03324 | Q47_2_1 – Années de mariage | 126 ans | Vérifier la valeur. |
+| 21/09 | 03319 | Taille de l’enfant | 5 210 cm | Vérifier la valeur et l’unité de mesure. |
+| 21/09 | 03320 | Statut du questionnaire | Champ laissé vide | Confirmer s’il s’agit d’un oubli ou si une information doit être renseignée. |
+| 21/09 | 03305 | Q44_1 – Nombre d’enfants avant la grossesse | 32 | Vérifier la valeur. |
+| 12/10 | 03381 | Q45_1 – Date des dernières règles | 01/02/2026 alors que la femme venait d’accoucher | Vérifier la date. |
+| 12/10 | 03366 | Q47_2_1 – Années de mariage | 66 ans | Vérifier la valeur. |
+| 21/09 | 03352 | Enquête Femmes | Identifiant en double | Contrôler les enregistrements concernés. |
+| 14/10 | 03389 / 03388 | Identifiant | Clarification demandée : « le 03389 d’hier devient 03388, c’est bien ça ? » | Confirmer l’identifiant correct avant harmonisation. |
+
+## 5.4. Farakan – enquêteur 04
+
+### Enquêteur 04 – HETIE/HIE Harimata dite Bamy
+
+| Date du signalement (2026) | Identifiant | Variable / question | Valeur signalée | Contrôle demandé |
+|---|---|---|---|---|
+| 19/10 | 04403 | Q45_1 – Date des dernières règles | 01/09/2026 alors que la femme venait d’accoucher | Vérifier la date. |
+| 26/10 | 04408 | Q45_1 – Date des dernières règles | 01/09/2026 alors que la femme venait d’accoucher | Vérifier la date. |
+| 26/10 | 04428 | Q45_1 – Date des dernières règles | 01/10/2026 alors que la femme venait d’accoucher | Vérifier la date. |
+
+## 5.5. Farakan – enquêteur 07
+
+### Enquêteur 07 – MILLOGO Regis
+
+| Date du signalement (2026) | Identifiant | Variable / question | Valeur signalée | Contrôle demandé |
+|---|---|---|---|---|
+| 21/09 | 04309 | Âge au premier rapport | 14 ans | Vérifier la valeur dans le questionnaire source. |
+| 21/09 | 04313 | Nombre de personnes contributrices | 1 500 | Vérifier la valeur et le contexte. |
+| 24/09 | 04322 | Q60 – Transport aller-retour pour une CPN | 3 500 FCFA | Confirmer le montant déclaré. |
+| 24/09 | 04327 | Q60 – Transport aller-retour pour une CPN | 2 500 FCFA | Confirmer le montant déclaré. |
+| 24/09 | 04333 | Q60 – Transport aller-retour pour une CPN | 15 000 FCFA | Confirmer le montant déclaré et vérifier le contexte d’accès au centre de santé. |
+| 30/09 | 04342 | Q45_1 – Date des dernières règles | 01/02/2026 alors que la femme venait d’accoucher | Vérifier la date. |
+| 30/09 | 04345 | Q44_1 – Nombre d’enfants avant la grossesse | 31 | Vérifier la valeur. |
+
+---
+
+# 6. Clarifications relatives au questionnaire
+
+## 6.1. Questions Q61 et Q62
+
+Le 02/10, une clarification a été transmise sur la logique des questions :
+
+- **Q61 :** demande si des frais ont été engagés ou non.
+- **Q62 :** cherche à identifier les facteurs qui déterminent la réalisation des tests, par exemple la distance ou le fait de savoir où se rendre.
+- **Q62 n’est pas conditionnée à Q61.**
+
+Cette clarification a été donnée pour éviter de considérer comme incohérente une réponse à Q62 du seul fait de la réponse à Q61.
+
+## 6.2. Chronologie des vaccinations
+
+Le 30/09, une demande de vérification a été adressée aux enquêteurs 01 et 05 pour contrôler la séquence :
+
+**Q88 → Q89 → Q90 → Q91**
+
+Les dates doivent être vérifiées dans les formulaires sources et respecter la chronologie attendue. Les tableaux détaillés par identifiant figurent dans la section 5.1.
+
+---
+
+# 7. Suivi des retours et niveau de documentation
+
+Les archives contiennent des demandes de vérification et quelques clarifications, mais elles ne documentent pas systématiquement la réponse finale des enquêteurs ni la correction effective dans la base.
+
+| Élément | Information documentée | Limite de l’archive |
+|---|---|---|
+| GOU040 | Une erreur de formulaire M6/M4 a été expliquée le 23/09 ; suppression du M6 erroné puis saisie du M4 proposée. | La réalisation effective de la correction n’est pas confirmée. |
+| Q61 / Q62 | La logique des deux questions a été clarifiée le 02/10. | Pas de journal de modification du questionnaire ou de la base dans l’archive. |
+| Charge virale M6 GOU | Résultats communiqués pour quatre identifiants. | Dates manquantes pour les quatre examens ; valeur manquante pour GOU051-E. |
+| Autres anomalies par site | Demandes de vérification, de confirmation ou de correction transmises. | Les réponses finales et corrections ne sont pas systématiquement présentes. |
+| Statuts de suivi terrain | Plusieurs situations rapportées en mars pour Lafiabougou et Ziniaré. | Ces situations doivent être actualisées ; elles ne décrivent pas nécessairement le statut actuel. |
+
+---
+
+# 8. Points à reprendre pour clôturer le registre
+
+Les actions suivantes sont à considérer comme des points de reprise, sous réserve de vérification dans les bases et formulaires sources :
+
+1. Vérifier les doublons signalés dans les bases de suivi et documenter, pour chaque cas, la décision prise.
+2. Reprendre les incohérences de parcours par site, en distinguant les visites réellement manquées des formulaires non saisis ou des erreurs d’identifiant.
+3. Confirmer les dates de suivi, d’inclusion et d’accouchement signalées comme incohérentes.
+4. Contrôler les valeurs aberrantes de l’enquête transversale à partir des questionnaires sources.
+5. Vérifier la chronologie des vaccinations Q88 à Q91, notamment l’ID 01340.
+6. Compléter les dates des examens de charge virale M6 et la valeur manquante de GOU051-E.
+7. Actualiser les retours de terrain de mars avant de qualifier les participantes comme perdues de vue, refusant le suivi ou ayant changé de situation.
+8. Renseigner un statut de traitement pour chaque requête : **à vérifier**, **en attente de retour**, **corrigée**, **confirmée sans correction** ou **non applicable**.
+
+---
+
+# 9. Note de traçabilité
+
+Ce document a été établi à partir des archives de messages fournies et des éléments connus dans la conversation jusqu’au **23 novembre 2026**. Il rassemble les constats et demandes tels qu’ils ont été communiqués, sans présumer de leur résolution.
+
+**Responsabilité projet : Data Manager**  
+**Étiquette professionnelle dans les échanges : Lead Data Engineer**

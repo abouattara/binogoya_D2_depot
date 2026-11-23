@@ -1,0 +1,14 @@
+name: binogoya_D2_depot
+title: binogoya_D2_depot
+username: abouattara
+account: abouattara
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 18504305
+appGuid:
+bundleId:
+url: https://abouattara.shinyapps.io/binogoya_D2_depot/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|01_collecte/binogoya_01-collecte_D2_engineer_conasur-lecture_v1.R|01_collecte/binogoya_01-collecte_D2_engineer_dgess-extraction_v1.R|01_collecte/binogoya_01-collecte_D2_engineer_geo-extraction_v1.R|01_collecte/binogoya_01-collecte_D2_engineer_opendata-lecture_v1.R|01_collecte/desktop.ini|02_nettoyage/binogoya_02-nettoyage_D2_engineer_conasur-nettoyage_v1.R|02_nettoyage/binogoya_02-nettoyage_D2_engineer_dgess-nettoyage_v1.R|02_nettoyage/binogoya_02-nettoyage_D2_engineer_opendata-nettoyage_v1.R|02_nettoyage/desktop.ini|03_transformation/binogoya_03-transformation_D2_engineer_dgess-tables-analyse_v1.R|03_transformation/desktop.ini|binogoya_00-pipeline_D2_engineer_executer-tout_v1.R|binogoya_02-nettoyage_D2_engineer_journal-donnees_v1.html|binogoya_02-nettoyage_D2_engineer_journal-donnees_v1.md|binogoya_rapport_analyse.docx|desktop.ini

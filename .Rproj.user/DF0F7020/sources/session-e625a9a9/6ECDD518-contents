@@ -1,0 +1,128 @@
+---
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+# Indicateurs du Défi 2 : méthode, forces et faiblesses
+
+Nov 21, 2026 · @binogoya
+
+Ce document décrit chaque indicateur calculé par les deux scripts d'analyse (`ecarts-education` et `parite-tendances`) : sa formule, sa source, ce qui le rend scientifiquement solide et ses limites.
+
+## 1. Indicateurs de base publiés
+
+Ces indicateurs sont lus tels que publiés par la DGESS ou l'INSD, puis harmonisés (année de fin d'année scolaire, libellés de région, sexe G/F/T). Tous les autres indicateurs en découlent.
+
+| Indicateur | Définition | Source | Forces | Faiblesses |
+| --- | --- | --- | --- | --- |
+| TBS (taux brut de scolarisation) | Élèves inscrits à un niveau, quel que soit leur âge / population d'âge officiel de ce niveau × 100 | DGESS (préscolaire, primaire), INSD OpenData (post-primaire, secondaire, provinces) | Indicateur officiel de l'ODD 4, comparable entre régions et dans le temps ; données administratives exhaustives | Dépasse 100 % avec les élèves hors âge ou déplacés ; dépend des projections de population (dénominateur) |
+| TBA (taux brut d'admission) | Nouveaux inscrits en 1re année (CP1) / population de l'âge d'entrée × 100 | DGESS | Mesure l'accès à l'entrée du système, sensible aux politiques récentes | Mêmes limites que le TBS ; ne dit rien du maintien à l'école |
+| IPS publié | Indicateur des filles / indicateur des garçons (TBS, TBA) | DGESS | Norme UNESCO, immédiate à lire (1 = parité) | Asymétrique : 0,8 et 1,25 sont à la même distance de la parité sans en avoir l'air ; certaines valeurs sont mal lues dans les fichiers |
+| Effectifs par sexe, région, milieu, statut | Nombre d'élèves inscrits | DGESS | Comptage exhaustif, sans dénominateur estimé | Ne mesure pas un accès : une hausse peut venir de la seule croissance démographique |
+| Nouveaux inscrits au CP1 | Nombre d'enfants entrant au primaire | DGESS | Signal précoce des changements d'accès | Sensible aux redoublements mal déclarés et aux fermetures d'écoles |
+
+**Contrôles appliqués.** Les valeurs aberrantes sont mises à valeur manquante : IPS hors de 0,3-3 et taux hors de 0-200 % dans le script parité-tendances (0,2-3 et 0-300 % dans le script IMDE). Ce sont par exemple des années lues comme valeurs. En cas de doublon, le premier relevé est conservé.
+
+## 2. Écarts filles-garçons
+
+L'écart de genre est mesuré de quatre façons complémentaires, qui répondent chacune à une question différente.
+
+
+$\mathrm{IPS} = \frac{\text{taux}^{F}}{\text{taux}^{G}} \qquad \text{écart de parité} = |\,\mathrm{IPS} - 1\,| \qquad g = |\ln \mathrm{IPS}| \qquad \text{écart en points} = \text{taux}^{F} - \text{taux}^{G}$
+
+| Indicateur | Calcul | Script | Forces | Faiblesses |
+| --- | --- | --- | --- | --- |
+| IPS recalculé | Taux des filles / taux des garçons, à partir des TBS et TBA par sexe | parité-tendances, IMDE | Contrôle l'IPS publié (écart médian et maximal par indicateur) ; disponible même quand l'IPS n'est pas publié | Hérite des erreurs des taux par sexe ; un écart avec l'IPS publié peut venir d'un arrondi |
+| Écart à la parité \|IPS − 1\| | Distance à la parité | parité-tendances | Lecture simple (0,15 = 15 % d'écart relatif) | Asymétrique : pénalise moins un désavantage des filles (IPS < 1) qu'un désavantage des garçons |
+| \|ln IPS\| | Logarithme de l'IPS en valeur absolue | IMDE | Symétrique (0,8 et 1,25 donnent le même écart) ; additif, adapté à l'agrégation | Moins parlant pour un lecteur non spécialiste ; perd le sens de l'écart (gardé à part) |
+| Écart en points (F − G) | Différence des taux | parité-tendances | Traduit l'écart en enfants : 10 points = 10 enfants sur 100 | Dépend du niveau : 10 points sur un TBS de 30 % pèsent plus que sur un TBS de 100 % |
+| Classe de parité | IPS < 0,97 : défavorable aux filles ; > 1,03 : aux garçons ; sinon parité | les deux | Seuils conventionnels de l'UNESCO, lisibles sur une carte | Effet de seuil : 0,969 et 0,971 tombent dans deux classes |
+| IPS moyen géométrique | exp(moyenne des ln IPS disponibles) | IMDE (typologie) | Résume le sens global de l'écart sur plusieurs niveaux sans qu'un niveau domine | Mélange des niveaux très différents (primaire et secondaire) |
+| Classement des régions | Moyenne de l'écart à la parité sur les 3 dernières années, puis rang | parité-tendances | Lisse les variations d'une année sur l'autre | Masque une dégradation très récente |
+
+## 3. Écarts entre territoires
+
+Ces indicateurs mesurent la distance entre une région et une couverture complète, et la distance entre régions.
+
+$a = 1 - \frac{\min(\mathrm{TBS}, 100)}{100} \qquad a_{\mathrm{trans}} = 1 - \min\!\left(\frac{\mathrm{TBS}_{\mathrm{post\text{-}primaire}}}{\mathrm{TBS}_{\mathrm{primaire}}}, 1\right) \qquad \mathrm{CV}_{t} = \frac{\sigma_{t}}{\mu_{t}}$
+
+| Indicateur | Calcul | Script | Forces | Faiblesses |
+| --- | --- | --- | --- | --- |
+| Déficit d'accès | 1 − TBS / 100, TBS plafonné à 100 % | IMDE | Mesure directe de la part d'enfants hors du système ; plafond qui neutralise l'effet des élèves hors âge | Le plafond efface les différences entre régions au-dessus de 100 % ; reste un TBS, pas un taux net |
+| Perte à la transition | 1 − TBS post-primaire / TBS primaire | IMDE | Repère le goulot d'étranglement après le primaire, mis en avant dans la note | Approximation transversale : ce ne sont pas les mêmes enfants suivis dans le temps ; corrélée au déficit post-primaire |
+| Coefficient de variation entre régions (CV) | Écart-type / moyenne des TBS régionaux, par année | les deux | Mesure relative (sans unité), standard de la sigma-convergence | Sensible à une seule région extrême (le Sahel) ; calculé seulement si au moins 10 régions sont renseignées |
+| Étendue | TBS maximal − TBS minimal entre régions | les deux | Lecture immédiate en points | Ne dépend que de deux régions |
+| Taux par province | Taux de scolarisation OpenData par province, tranche d'âge officielle de chaque niveau (6-11 ans au primaire) | les deux | Seule source infra-régionale : révèle des écarts cachés par la moyenne régionale | Années rapprochées de la DGESS par un calage ; définition à confirmer (taux brut ou net) ; Centre rapproché de « Centre sans Ouagadougou » |
+
+## 4. Écart ville-campagne
+
+La DGESS ne publie le milieu qu'en effectifs, au niveau national. Sans population par milieu, l'écart ne peut pas être exprimé en taux : il est mesuré en parts et en indices d'évolution.
+
+$\text{part des filles} = \frac{F}{F + G} \qquad \text{indice}_{t} = 100 \times \frac{\text{effectifs}_{t}}{\text{effectifs}_{2016}} \qquad \text{part rurale} = \frac{\text{effectifs ruraux}}{\text{effectifs ruraux} + \text{urbains}}$
+
+| Indicateur | Calcul | Forces | Faiblesses |
+| --- | --- | --- | --- |
+| Part des filles par milieu | Filles / (filles + garçons), en ville et à la campagne | Ne dépend d'aucune projection de population | Une part de 48 % peut refléter la structure par sexe de la population d'âge scolaire, pas seulement l'accès |
+| Rapport filles / garçons par milieu | F / G | Comparable à un IPS | Ce n'est pas un IPS : il compare des effectifs, pas des taux |
+| Différence de part des filles (rural − urbain) | Part rurale des filles − part urbaine | Isole l'écart de genre propre à la campagne | Même limite que la part des filles |
+| Indice base 100 (2015/2016) | Effectifs de l'année / effectifs de 2015/2016 × 100, par milieu | Montre si le rural décroche par rapport à l'urbain (fermetures d'écoles, déplacements) | Une baisse rurale peut venir de l'exode vers les villes, pas d'une baisse d'accès |
+| Part rurale des effectifs | Effectifs ruraux / total | Suit le déplacement de la pression scolaire vers les villes | Même ambiguïté entre accès et migration |
+| Rapport des indices rural / urbain | Indice rural / indice urbain × 100 | Résume l'écart de dynamique en un chiffre | Masque les niveaux de départ |
+
+Avec des dénominateurs par milieu (RGPH 2019, projections INSD), ces parts pourraient devenir de vrais taux urbains et ruraux. Le script parité-tendances le prévoit déjà si une table `pop_milieu` est fournie.
+
+## 5. Évolution des écarts
+
+Les séries ne comptent que dix années (2016-2025) : les méthodes retenues sont choisies pour rester fiables sur des séries courtes.
+
+$\text{pente de Sen} = \operatorname{médiane}_{i<j}\left(\frac{y_{j} - y_{i}}{x_{j} - x_{i}}\right) \qquad \Delta = \overline{\text{écart}}_{\text{après 2020}} - \overline{\text{écart}}_{\text{avant 2020}}$
+
+| Indicateur | Calcul | Script | Forces | Faiblesses |
+| --- | --- | --- | --- | --- |
+| Pente de Sen | Médiane des pentes entre toutes les paires d'années | parité-tendances | Robuste aux valeurs aberrantes et aux années atypiques ; aucune hypothèse de loi normale | Suppose une tendance régulière ; ne voit pas une rupture |
+| Test de Mann-Kendall (seuil 10 %) | Corrélation de rang de Kendall entre l'année et l'écart | parité-tendances | Test non paramétrique standard pour les tendances ; dit si la tendance est nette | Peu puissant avec 10 points, d'où le seuil de 10 % ; « pas de tendance nette » ne veut pas dire « stable » |
+| Convergence / divergence | Tendance significative de l'écart (ou du CV) à la baisse ou à la hausse | parité-tendances | Verdict lisible pour chaque région | Hérite des limites du test |
+| Écart avant / après 2019/2020 | Différence des écarts moyens entre les deux périodes | parité-tendances | Mesure l'effet de la crise sécuritaire et des fermetures d'écoles | La date de rupture est choisie, pas estimée ; un changement de base des projections de population peut créer une fausse rupture |
+| Pente de l'IMDE structurel | Pente des moindres carrés de l'IMDE (genre + accès) en fonction de l'année, au moins 4 années | IMDE | Résume l'évolution de toutes les dimensions à la fois | Sensible aux années extrêmes ; dépend de la normalisation commune à toutes les années |
+| Sigma-convergence | Tendance du CV des TBS entre régions | les deux | Dit si les régions se rapprochent ou s'éloignent | Un rapprochement peut venir d'une baisse des régions favorisées, pas d'un progrès des autres |
+
+## 6. Moyens et contexte
+
+Ces indicateurs n'expliquent pas l'inégalité à eux seuls, mais ils aident à l'interpréter et à cibler l'action.
+
+| Indicateur | Calcul | Script | Forces | Faiblesses |
+| --- | --- | --- | --- | --- |
+| Élèves par école primaire | Effectifs du primaire / nombre d'écoles primaires (statut total) | les deux | Mesure simple de la pression sur l'offre scolaire | Ne dit rien de la taille des classes ni du nombre d'enseignants (aucun tableau sur le personnel) |
+| Enfants déplacés pour 100 élèves | 100 × enfants déplacés internes / effectifs du primaire | IMDE | Rapporte le déplacement à la taille du système scolaire local | Compte aussi les moins de 5 ans ; total estimé quand il manque (57 % des lignes) ; stock 2023 reporté après 2023 |
+| Enfants déplacés (logarithme) | ln(1 + enfants déplacés) | IMDE (provinces, communes) | Utilisable sans population ; le logarithme limite le poids des quelques zones très touchées | Volume absolu : une grande province paraît plus touchée qu'une petite à proportion égale |
+| Écoles OSM par commune et pour 100 km² | Établissements OpenStreetMap (écoles, maternelles, collèges) rattachés à leur commune par localisation | application | Seule mesure de l'offre à l'échelle communale | Couverture OSM inégale, meilleure en ville ; une école fermée peut rester recensée |
+| Enfants déplacés par école | Enfants déplacés / nombre d'écoles OSM | application | Repère les communes où l'accueil des déplacés pèse le plus sur les écoles | Cumule les limites des deux sources |
+| Lien déplacement / évolution de l'écart | Corrélation de Spearman entre enfants déplacés et variation de l'écart de parité | parité-tendances | Teste une hypothèse de la note : l'insécurité creuse les écarts | 13 régions seulement : résultat indicatif, pas une preuve de causalité |
+
+## 7. Indices composites et classements
+
+Ces indicateurs combinent les précédents pour classer les zones. Le détail du calcul de l'IMDE figure dans le document « IMDE : méthodologie de conception ».
+
+$s = \frac{x - \min}{\max - \min} \qquad D_{d} = \overline{s}_{\,j \in d} \qquad \mathrm{IMDE} = \frac{1}{3}\left(D_{\mathrm{genre}} + D_{\mathrm{accès}} + D_{\mathrm{moyens}}\right)$
+
+| Indicateur | Calcul | Forces | Faiblesses |
+| --- | --- | --- | --- |
+| IMDE régional (2024) | Min-max, moyenne par dimension, puis moyenne des 3 dimensions | Synthèse lisible ; décomposable en 3 dimensions ; dimensions à poids égal | Relatif aux 13 régions comparées ; agrégation compensatoire (un bon score compense un mauvais) |
+| IMDE provincial (2025) | Même méthode sur les provinces, données OpenData | Révèle les écarts infra-régionaux | Moins d'indicateurs disponibles ; contexte mesuré en volume |
+| IMDE structurel | Genre + accès, normalisation commune à toutes les années | Comparable d'une année à l'autre | Sans la dimension moyens (pas de déplacement avant 2019) |
+| Intervalle de rang | 5e et 95e centiles du rang sur 2 000 pondérations de Dirichlet | Montre la confiance qu'on peut accorder à chaque rang | Les valeurs manquantes sont remplacées par la moyenne dans les simulations |
+| Probabilité d'être en tête | Part des simulations où la zone est parmi les k premières | Traduit la robustesse en un chiffre parlant | Dépend du choix de k |
+| IMDE pondéré par ACP | Poids = charges de la première composante principale | Contrôle indépendant des poids égaux (corrélation de rang de 0,92) | Instable avec 13 régions et presque autant d'indicateurs |
+| Typologie | Tiers supérieur en genre, en accès, ou les deux, et sens de l'IPS | Oriente vers des réponses différentes (mesures pour les filles ou offre pour tous) | Seuils relatifs (terciles) ; effets de seuil |
+| Provinces prioritaires et poches cachées | 5e quintile de l'IMDE provincial ; prioritaire dans une région hors du tiers supérieur | Repère ce que la moyenne régionale masque | La part de 20 % est une convention |
+| Indice de priorité communal | Moyenne de l'IMDE de la province, des enfants déplacés normalisés et de la faible densité d'écoles OSM | Seul outil de ciblage communal disponible | Provisoire : aucune donnée éducative communale n'y entre encore |
+
+## 8. Limites communes à tous les indicateurs
+
+- **Dénominateurs** : tous les taux reposent sur des projections de population. Leur erreur se reporte sur chaque TBS, chaque IPS et chaque écart. Un test de sensibilité sur ces projections reste à faire, surtout autour de 2019/2020.
+- **Insécurité** : les zones les plus touchées sont aussi les moins bien renseignées (écoles fermées, collectes interrompues). Les inégalités y sont probablement sous-estimées.
+- **Niveau géographique** : les données éducatives s'arrêtent à la province. Les fichiers communaux du RGPH 2019 et le nombre d'écoles par commune sont lus mais pas encore exploités.
+- **Données exhaustives** : les données administratives ne comportent pas d'erreur d'échantillonnage. Les tests de tendance mesurent donc la régularité d'une évolution, pas une incertitude d'enquête.
+- **Descriptif, pas causal** : aucun indicateur ne dit pourquoi un écart existe. Les corrélations avec le déplacement restent indicatives.
+- **Périmètre à aligner** : le script IMDE utilise encore le CEP et les niveaux post-primaire et secondaire, que le journal des données exclut. Le script parité-tendances respecte déjà le périmètre préscolaire et primaire.

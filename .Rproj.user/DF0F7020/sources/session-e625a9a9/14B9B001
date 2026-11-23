@@ -1,0 +1,27 @@
+{
+    "id": "14B9B001",
+    "path": "~/TRAVAUX/binogoya_D2_depot/app.R",
+    "project_path": "app.R",
+    "type": "r_source",
+    "hash": "1270289698",
+    "contents": "",
+    "dirty": false,
+    "created": 1795466220049.0,
+    "source_on_save": false,
+    "relative_order": 5,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "4,108",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1795467262,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1795467262995,
+    "read_only": false,
+    "read_only_alternatives": []
+}

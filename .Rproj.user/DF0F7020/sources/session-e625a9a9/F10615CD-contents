@@ -1,0 +1,199 @@
+# IMDE : méthodologie de conception
+
+Nov 19, 2026 · @Samourai Corp
+
+## 1. Objet et origine
+
+L'IMDE (indice multidimensionnel de disparité éducative) résume en un nombre compris entre 0 et 1 le degré d'inégalité d'accès à l'éducation d'un territoire : 0 pour le territoire le plus favorable, 1 pour le plus défavorable. Il est calculé pour les 13 régions (année de référence 2024) et pour les provinces (2025).
+
+**Pourquoi un indice composite.** Les écarts filles-garçons, les écarts entre territoires et le manque de moyens sont publiés dans des tableaux séparés. Ils se cumulent pourtant chez les mêmes enfants. Un indice unique permet de classer les zones, de cartographier les plus inégales et de voir quelle dimension pèse le plus dans chacune.
+
+**Filiation.** L'IMDE ne reprend pas un indice existant. Il assemble des briques éprouvées :
+
+- la **note d'intention** du projet, qui définit trois dimensions (équité de genre, équité spatiale, équité des moyens) et demande de tester les pondérations par ACP et par simulations ;
+- les **cibles 4.1 et 4.5 de l'ODD 4** et les **indices de parité** de l'Institut de statistique de l'UNESCO (IPS = indicateur des filles / indicateur des garçons) ;
+- le **manuel OCDE-JRC sur les indicateurs composites** (2008), dont l'IMDE suit les étapes : choix des indicateurs, normalisation, pondération, agrégation, analyse de sensibilité ;
+- la normalisation **min-max de l'indice de développement humain** (PNUD) ;
+- l'approche par **dimensions** des indices de pauvreté multidimensionnelle (Alkire-Foster), où chaque dimension est d'abord résumée séparément ;
+- l'**analyse d'incertitude par pondérations aléatoires** (Saisana, Saltelli et Tarantola, 2005), qui juge un classement à sa stabilité quand les poids varient.
+
+## 2. Indicateurs élémentaires
+
+Chaque indicateur est orienté de sorte qu'une valeur plus élevée signifie plus d'inégalité ou plus de manque. Pour une région r et une année t, on calcule les indicateurs suivants.
+
+**Équité de genre.** L'indice de parité du niveau k est le rapport des taux des filles et des garçons. L'écart à la parité est sa valeur absolue en logarithme :
+
+```latex
+\mathrm{IPS}_{k} = \frac{\text{taux}^{F}_{k}}{\text{taux}^{G}_{k}} \qquad g_{k} = \left|\ln \mathrm{IPS}_{k}\right|
+```
+
+Le logarithme rend la mesure symétrique : un IPS de 0,8 et un IPS de 1,25 donnent le même écart (0,22). Sans logarithme, |IPS − 1| vaudrait 0,20 dans le premier cas et 0,25 dans le second, alors que les deux situations sont exactement inversées. Au primaire, l'IPS publié par la DGESS est utilisé en priorité, l'IPS recalculé sinon.
+
+**Équité d'accès.** Le déficit de scolarisation du niveau k et la perte au passage du primaire au post-primaire sont :
+
+```latex
+a_{k} = 1 - \frac{\min(\mathrm{TBS}_{k},\,100)}{100} \qquad a_{\mathrm{trans}} = 1 - \min\!\left(\frac{\mathrm{TBS}_{\mathrm{post\text{-}primaire}}}{\mathrm{TBS}_{\mathrm{primaire}}},\,1\right)
+```
+
+Le TBS est plafonné à 100 % : au-delà, il reflète des élèves hors âge ou déplacés plutôt qu'une meilleure couverture.
+
+**Moyens et contexte.**
+
+```latex
+m_{\mathrm{élèves}} = \frac{\text{effectifs du primaire}}{\text{nombre d'écoles primaires}} \qquad m_{\mathrm{PDI}} = 100 \times \frac{\text{enfants déplacés internes}}{\text{effectifs du primaire}}
+```
+
+| Dimension | Indicateur | Source | Sens |
+| --- | --- | --- | --- |
+| Genre | g : parité du TBS primaire | DGESS | écart à la parité |
+| Genre | g : parité de réussite au CEP | DGESS | écart à la parité |
+| Genre | g : parité du TBS post-primaire | INSD OpenData | écart à la parité |
+| Genre | g : parité du TBS secondaire | INSD OpenData | écart à la parité |
+| Accès | a : déficit de TBS primaire | DGESS | manque de couverture |
+| Accès | a : déficit de TBS post-primaire | INSD OpenData | manque de couverture |
+| Accès | a : déficit de TBS secondaire | INSD OpenData | manque de couverture |
+| Accès | a : perte primaire → post-primaire | DGESS et OpenData | décrochage à la transition |
+| Moyens | m : élèves par école primaire | DGESS | pression sur l'offre |
+| Moyens | m : enfants déplacés pour 100 élèves | CONASUR, DGESS | pression du déplacement |
+
+Le CEP et les niveaux post-primaire et secondaire figurent dans la version actuelle du script. Si le périmètre est réduit au préscolaire et au primaire, ces quatre indicateurs sortent de l'indice, avec la perte à la transition.
+
+## 3. Normalisation et agrégation
+
+**Normalisation min-max.** Chaque indicateur x est ramené entre 0 et 1 sur l'ensemble des n territoires comparés la même année :
+
+```latex
+s_{i,j} = \frac{x_{i,j} - \min_{l} x_{l,j}}{\max_{l} x_{l,j} - \min_{l} x_{l,j}}
+```
+
+où i est le territoire et j l'indicateur. La valeur 0 désigne le territoire le plus favorable de l'ensemble, 1 le plus défavorable. Un indicateur renseigné pour moins de trois territoires, ou sans aucune variation, est écarté.
+
+**Score de dimension.** Le score de la dimension d est la moyenne des indicateurs disponibles de cette dimension :
+
+```latex
+D_{i,d} = \frac{1}{|J_{i,d}|} \sum_{j \in J_{i,d}} s_{i,j}
+```
+
+où J\_{i,d} est l'ensemble des indicateurs de d renseignés pour i. Le score n'est calculé que si au moins la moitié des indicateurs de la dimension est disponible.
+
+**IMDE.** L'indice est la moyenne des scores de dimension, à poids égaux :
+
+```latex
+\mathrm{IMDE}_{i} = \frac{1}{|K_{i}|} \sum_{d \in K_{i}} D_{i,d}
+```
+
+où K\_i est l'ensemble des dimensions calculées pour i. Il faut au moins deux dimensions sur trois. Le rang 1 est attribué au territoire le plus inégal.
+
+**Double moyenne.** Faire la moyenne par dimension avant la moyenne générale donne le même poids à chaque dimension, quel que soit son nombre d'indicateurs. Sans cette étape, la dimension genre (quatre indicateurs) pèserait deux fois plus que la dimension moyens (deux indicateurs).
+
+**Pondération libre dans l'application.** L'application Shiny permet de choisir des poids w\_d (de 0 à 3) et recalcule une moyenne pondérée des dimensions disponibles :
+
+```latex
+\mathrm{IMDE}^{w}_{i} = \frac{\sum_{d \in K_i} w_d \, D_{i,d}}{\sum_{d \in K_i} w_d}
+```
+
+## 4. Robustesse du classement
+
+Le classement est jugé robuste : la corrélation de rang entre l'IMDE à poids égaux et l'IMDE pondéré par ACP vaut 0,92.
+
+**Simulations de pondérations.** Les poids égaux sont un choix normatif. Pour en mesurer l'effet, 2 000 jeux de poids sont tirés au hasard selon une loi de Dirichlet de paramètres tous égaux à 1, c'est-à-dire uniformément parmi toutes les pondérations possibles dont la somme vaut 1. Le tirage se fait à deux niveaux, entre dimensions puis entre indicateurs d'une même dimension :
+
+```latex
+(\omega_{1},\dots,\omega_{D}) \sim \mathrm{Dir}(1,\dots,1) \qquad (v_{d,1},\dots,v_{d,n_d}) \sim \mathrm{Dir}(1,\dots,1) \qquad S^{(b)}_{i} = \sum_{d} \omega_{d} \sum_{j \in d} v_{d,j}\, s_{i,j}
+```
+
+Pour chaque tirage b, on recalcule le rang de chaque territoire. On retient pour chacun :
+
+- son **rang médian** ;
+- son **intervalle de rang à 90 %** (5e et 95e centiles) ;
+- sa **probabilité d'être en tête**, c'est-à-dire parmi les k premiers, avec k = max(3, n/5 arrondi).
+
+Dans ces simulations, une valeur manquante est remplacée par la moyenne de l'indicateur. Un intervalle court signifie un rang qui ne dépend pas du choix des poids.
+
+**Pondération par ACP.** Une analyse en composantes principales est faite sur les indicateurs normalisés et centrés-réduits. Le poids de chaque indicateur est la valeur absolue de sa charge sur la première composante, ramenée à une somme de 1 :
+
+```latex
+\pi_{j} = \frac{|u_{1j}|}{\sum_{l} |u_{1l}|} \qquad \mathrm{IMDE}^{\mathrm{ACP}}_{i} = \text{min-max}\Big(\sum_{j} \pi_{j}\, z_{i,j}\Big)
+```
+
+où u\_1 est le premier vecteur propre et z\_{i,j} l'indicateur centré-réduit. Cette pondération donne plus de poids aux indicateurs qui résument le mieux les écarts communs à l'ensemble des indicateurs. La part de variance expliquée par la première composante est publiée avec les poids. On compare enfin les deux classements par la corrélation de Spearman.
+
+## 5. Typologie et zones prioritaires
+
+La typologie distingue les zones où les filles sont désavantagées de celles où l'exclusion touche tous les enfants, car les réponses publiques y diffèrent.
+
+Une zone est « haute » sur une dimension si son score atteint le tiers supérieur de la distribution (2e tercile). Le sens de l'écart de genre est donné par la moyenne géométrique des IPS disponibles :
+
+```latex
+\overline{\mathrm{IPS}}_{i} = \exp\Big(\frac{1}{|L_i|}\sum_{k \in L_i} \ln \mathrm{IPS}_{i,k}\Big)
+```
+
+| Genre haut | Accès haut | IPS moyen | Type |
+| --- | --- | --- | --- |
+| oui | oui | < 1 | Cumul : exclusion générale + filles désavantagées |
+| — | oui | autre cas | Exclusion générale (tous les enfants) |
+| oui | non | < 1 | Filles désavantagées |
+| oui | non | ≥ 1 | Garçons désavantagés |
+| non | non | — | Écarts modérés |
+
+Une zone sans score de genre ou d'accès est classée « données insuffisantes ».
+
+**Provinces prioritaires.** Ce sont les 20 % de provinces dont l'IMDE est le plus élevé (5e quintile).
+
+**Poches cachées.** Une province prioritaire est une poche cachée quand sa région n'est pas dans le tiers supérieur du classement régional (rang > 5 sur 13). Ces zones sont invisibles dans une lecture régionale : c'est l'apport principal de la désagrégation.
+
+## 6. Variantes de l'indice
+
+La même méthode est déclinée en trois variantes, chacune adaptée aux données disponibles à son niveau.
+
+| Variante | Niveau | Dimensions et indicateurs | Normalisation |
+| --- | --- | --- | --- |
+| IMDE provincial | 45 provinces, année la plus récente avec au moins 30 provinces (2025) | Genre : parité primaire, post-primaire, secondaire (OpenData) · Accès : déficits aux trois niveaux, perte à la transition · Contexte : ln(1 + enfants déplacés) | min-max entre provinces, une année |
+| IMDE structurel | 13 régions, toutes les années | Genre et accès seulement : les données de déplacement n'existent qu'à partir de 2019 | min-max sur l'ensemble régions × années, pour comparer les années entre elles |
+| Indice de priorité communal | communes | IMDE de la province · ln(1 + enfants déplacés), normalisé · faible densité d'écoles OSM (application) | moyenne des composantes disponibles |
+
+**Contexte provincial.** Faute de population scolaire par province, le déplacement est mesuré par le logarithme du nombre d'enfants déplacés. Le logarithme limite le poids des quelques provinces qui concentrent la plupart des déplacés.
+
+**Tendance.** L'évolution de chaque région est résumée par la pente de la droite des moindres carrés de l'IMDE structurel en fonction de l'année (au moins 4 années). Une pente positive signifie que les écarts se creusent.
+
+**Indice communal.** Aucune donnée éducative communale n'est encore exploitée. Cet indice est un outil de ciblage provisoire, et non une mesure de l'inégalité éducative dans la commune.
+
+## 7. Forces
+
+- **Transparence** : chaque étape est une formule simple, le calcul se refait à la main et chaque score se décompose en ses trois dimensions.
+- **Lecture directe** : 0 pour le territoire le plus favorable, 1 pour le plus défavorable ; la carte se lit sans légende technique.
+- **Parité symétrique** : |ln IPS| traite de la même façon un désavantage des filles et un désavantage des garçons, et la typologie garde le sens de l'écart.
+- **Dimensions équilibrées** : la double moyenne empêche une dimension riche en indicateurs de dominer l'indice.
+- **Robustesse mesurée** : chaque rang est donné avec son intervalle, et la pondération ACP confirme le classement (corrélation de rang de 0,92).
+- **Données manquantes gérées** : un territoire reste classé s'il lui manque un indicateur, sous des seuils explicites (la moitié des indicateurs d'une dimension, deux dimensions sur trois).
+- **Utilité pour l'action** : la typologie oriente vers des réponses différentes, et les poches cachées signalent des zones que la moyenne régionale masque.
+- **Reproductibilité** : l'indice se recalcule chaque année à partir des annuaires, avec le même code.
+
+## 8. Faiblesses et pistes d'amélioration
+
+| Faiblesse | Conséquence | Piste |
+| --- | --- | --- |
+| Normalisation relative (min-max) | Le score dépend des territoires comparés et des extrêmes : une seule valeur aberrante écrase les autres, et un 0 ne veut pas dire « aucune inégalité » | Bornes fixes de référence (par exemple parité = 0, écart de 0,5 = 1), comme les bornes de l'IDH |
+| Agrégation compensatoire (moyenne arithmétique) | Un bon score d'accès compense un mauvais score de genre | Moyenne géométrique des dimensions, adoptée par l'IDH en 2010 |
+| Petit nombre d'unités (13 régions) | Seuils de typologie et ACP instables ; avec presque autant d'indicateurs que de régions, l'ACP est fragile | Présenter l'ACP comme un contrôle, pas comme la pondération retenue ; privilégier le niveau provincial |
+| Indicateurs corrélés | Le déficit au post-primaire et la perte à la transition mesurent en partie la même chose : double comptage | Vérifier les corrélations et retirer l'un des deux si elles dépassent environ 0,9 |
+| Dépendance au TBS | Le TBS dépend des projections de population ; le plafonnement à 100 % efface les différences au-dessus de ce seuil | Taux nets de scolarisation quand ils sont disponibles ; test de sensibilité sur les dénominateurs |
+| Symétrie de \|ln IPS\| | Un écart en défaveur des garçons pèse autant qu'un écart en défaveur des filles : c'est un choix normatif | L'assumer explicitement ou utiliser l'IPS ajusté de l'UNESCO (borné entre 0 et 2) |
+| Proxy de déplacement | Enfants déplacés de 0 à 5 ans inclus, total estimé quand il manque (57 % des lignes), stock 2023 reporté après 2023 | Restreindre aux enfants d'âge scolaire ; actualiser avec les données CONASUR récentes |
+| Sources d'années différentes | DGESS et OpenData sont rapprochées par un calage d'année (décalage 0 retenu) | Contrôler le calage sur plusieurs indicateurs |
+| Imputation simple dans les simulations | La moyenne remplace les valeurs manquantes, ce qui rapproche les territoires mal renseignés du milieu du classement | Imputation multiple ou exclusion des territoires trop incomplets |
+| Indice descriptif | L'IMDE localise les inégalités mais n'en explique pas les causes | Modèles explicatifs séparés, sans les intégrer à l'indice |
+
+La limite la plus importante pour la lecture des résultats est la normalisation relative. Un IMDE de 0,2 signifie « parmi les moins inégaux du pays », pas « peu inégal » dans l'absolu.
+
+## 9. Références
+
+- Alkire, S. et Foster, J. (2011). *Counting and multidimensional poverty measurement*. Journal of Public Economics, 95(7-8).
+- OCDE et Centre commun de recherche de la Commission européenne (2008). *Handbook on Constructing Composite Indicators: Methodology and User Guide*. Paris, Éditions OCDE.
+- PNUD. *Rapport sur le développement humain*, notes techniques sur le calcul de l'IDH.
+- Saisana, M., Saltelli, A. et Tarantola, S. (2005). *Uncertainty and sensitivity analysis techniques as tools for the quality assessment of composite indicators*. Journal of the Royal Statistical Society, Series A, 168(2).
+- Institut de statistique de l'UNESCO. Métadonnées de l'ODD 4, indicateur 4.5.1 (indices de parité).
+- Note d'intention du projet : Data Challenge Burkina, Défi 2.
+- Code de calcul : `04_analyse/binogoya_04-analyse_D2_analyst_ecarts-education_v1.R` (fonction `scorer`).
+
+Références citées de mémoire : vérifier les numéros de volume et de page avant de les reprendre dans le rapport.

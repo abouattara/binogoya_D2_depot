@@ -1,0 +1,90 @@
+# L'IMDE expliqué avec des chiffres
+
+Nov 21, 2026 · @Samourai Corp
+
+Trois régions inventées, Kalo, Bema et Sora, avec des chiffres inventés : Kalo finit première (IMDE 0,88), c'est-à-dire la région qui a le plus de difficultés. Pour simplifier, chaque matière n'a que deux petites notes.
+
+## Étape 1 : les chiffres de départ
+
+|  | Kalo | Bema | Sora |
+| --- | --- | --- | --- |
+| Filles à l'école primaire, pour 100 garçons | 80 | 95 | 100 |
+| Filles au secondaire, pour 100 garçons | 60 | 70 | 90 |
+| Enfants qui vont à l'école primaire | 40 % | 90 % | 60 % |
+| Enfants qui vont au collège | 15 % | 50 % | 25 % |
+| Élèves par école | 250 | 150 | 300 |
+| Enfants déplacés, pour 100 élèves | 30 | 0 | 50 |
+
+## Étape 2 : transformer chaque chiffre en « problème »
+
+On veut que plus le nombre est grand, plus il y a de problèmes.
+
+- Pour les filles, on regarde combien il en manque pour arriver à 100. À Kalo : 100 − 80 = 20 filles manquent.
+- Pour l'accès, on regarde combien d'enfants ne vont pas à l'école. À Kalo : 100 − 40 = 60 %.
+- Les élèves par école et les enfants déplacés sont déjà des problèmes : on les garde tels quels.
+
+| Problème | Kalo | Bema | Sora |
+| --- | --- | --- | --- |
+| Filles qui manquent au primaire | 20 | 5 | 0 |
+| Filles qui manquent au secondaire | 40 | 30 | 10 |
+| Enfants hors du primaire | 60 | 10 | 40 |
+| Enfants hors du collège | 85 | 50 | 75 |
+| Élèves par école | 250 | 150 | 300 |
+| Enfants déplacés | 30 | 0 | 50 |
+
+## Étape 3 : tout ramener entre 0 et 1
+
+Pour chaque ligne, la région qui a le moins de problèmes reçoit 0, celle qui en a le plus reçoit 1, et celle du milieu un nombre entre les deux.
+
+**Exemple de calcul, enfants hors du primaire.** Le plus petit chiffre est 10 (Bema) et le plus grand 60 (Kalo), soit 50 points d'écart. Sora a 40, c'est-à-dire 30 points de plus que Bema. Sa note est donc 30 ÷ 50 = 0,60.
+
+| Note entre 0 et 1 | Kalo | Bema | Sora |
+| --- | --- | --- | --- |
+| Filles au primaire | 1 | 0,25 | 0 |
+| Filles au secondaire | 1 | 0,67 | 0 |
+| Hors du primaire | 1 | 0 | 0,60 |
+| Hors du collège | 1 | 0 | 0,71 |
+| Élèves par école | 0,67 | 0 | 1 |
+| Enfants déplacés | 0,60 | 0 | 1 |
+
+## Étape 4 : la moyenne de chaque matière
+
+On fait la moyenne des deux notes de chaque matière. Pour Bema en « Filles et garçons » : (0,25 + 0,67) ÷ 2 = 0,46.
+
+| Matière | Kalo | Bema | Sora |
+| --- | --- | --- | --- |
+| Filles et garçons | 1,00 | 0,46 | 0,00 |
+| Accès | 1,00 | 0,00 | 0,66 |
+| Moyens | 0,63 | 0,00 | 1,00 |
+
+## Étape 5 : la moyenne générale, c'est l'IMDE
+
+| Région | Calcul | IMDE | Rang |
+| --- | --- | --- | --- |
+| Kalo | (1,00 + 1,00 + 0,63) ÷ 3 | **0,88** | 1er : le plus de difficultés |
+| Sora | (0,00 + 0,66 + 1,00) ÷ 3 | **0,55** | 2e |
+| Bema | (0,46 + 0,00 + 0,00) ÷ 3 | **0,15** | 3e : le moins de difficultés |
+
+## Étape 6 : vérifier que le classement tient
+
+Et si la question des filles comptait deux fois plus que les autres matières ?
+
+| Région | Calcul | Score |
+| --- | --- | --- |
+| Kalo | (2 × 1,00 + 1,00 + 0,63) ÷ 4 | 0,91 |
+| Sora | (2 × 0,00 + 0,66 + 1,00) ÷ 4 | 0,41 |
+| Bema | (2 × 0,46 + 0,00 + 0,00) ÷ 4 | 0,23 |
+
+Les scores changent, mais l'ordre reste le même : Kalo, puis Sora, puis Bema. Le vrai script fait ce test 2 000 fois avec des poids différents.
+
+## Étape 7 : quel type de problème ?
+
+- **Kalo** a des problèmes partout, et surtout les filles sont moins scolarisées. Il lui faut des écoles et des mesures pour les filles.
+- **Sora** n'a presque pas de problème filles-garçons. Ce sont tous les enfants qui manquent d'écoles, et beaucoup ont été déplacés. Il lui faut des places en classe et l'accueil des enfants déplacés.
+- **Bema** va plutôt bien. Il reste un petit écart pour les filles au collège : il faut le surveiller.
+
+Sora et Kalo sont toutes les deux en difficulté, mais on ne les aiderait pas de la même façon. C'est pour ça que le score seul ne suffit pas.
+
+## Pour les grands
+
+Dans le vrai calcul, l'écart filles-garçons n'est pas « 100 − filles » : c'est |ln(IPS)|, qui compte de la même façon un manque de filles et un manque de garçons. Le vrai IMDE utilise aussi 10 indicateurs au lieu de 6, sur les 13 régions. Les étapes, elles, sont exactement les mêmes.

@@ -1,0 +1,26 @@
+{
+    "id": "1589F71F",
+    "path": "~/TRAVAUX/binogoya_D2_depot/05_interpretation/binogoya_05-interpretation_D2_analyst_app-shiny_v2.R",
+    "project_path": "05_interpretation/binogoya_05-interpretation_D2_analyst_app-shiny_v2.R",
+    "type": "r_source",
+    "hash": "3218038055",
+    "contents": "",
+    "dirty": false,
+    "created": 1795468240787.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "665,20",
+        "scrollLine": "648"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1795468349,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1795468349704,
+    "read_only": false,
+    "read_only_alternatives": []
+}

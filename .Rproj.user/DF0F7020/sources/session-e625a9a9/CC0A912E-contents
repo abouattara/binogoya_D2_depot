@@ -1,0 +1,357 @@
+---
+title: "Où agir contre les inégalités d'accès à l'école ?"
+subtitle: "Data Challenge Burkina · Défi 2 · Disparités d'accès à l'éducation"
+author: "Équipe binogoya"
+date: today
+date-format: "D MMMM YYYY"
+lang: fr
+format:
+  pptx:
+    reference-doc: binogoya_05-interpretation_D2_analyst_modele-pptx_v1.pptx
+    slide-level: 2
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+# ---------------------------------------------------------------------------
+# Présentation au jury, 15 minutes, format PowerPoint.
+# Rendu (depuis le projet binogoya_D2_depot.Rproj) :
+#   quarto::quarto_render("05_interpretation/binogoya_05-interpretation_D2_analyst_presentation-jury_v1.qmd")
+# Prérequis :
+#   - 04_analyse/binogoya_04-analyse_D2_analyst_ecarts-education_v1.R exécuté (résultats + figures)
+#   - 05_interpretation/images/ : schémas de la présentation (fournis)
+#   - 05_interpretation/images/binogoya_05-interpretation_D2_analyst_capture-application_v1.png :
+#     capture d'écran de l'application, à faire soi-même (diapositive de démonstration)
+# Les chiffres et les phrases des diapositives « résultats » sont calculés à partir des données.
+# ---------------------------------------------------------------------------
+source(here::here("binogoya_00-config_D2_engineer_chemins_v1.R"))
+installer(c("dplyr", "tidyr", "purrr", "stringr", "knitr"))
+suppressPackageStartupMessages({ library(dplyr); library(tidyr); library(purrr); library(stringr); library(knitr) })
+
+exiger(FIC$resultats_rds, "04_analyse/binogoya_04-analyse_D2_analyst_ecarts-education_v1.R")
+R <- readRDS(FIC$resultats_rds)
+
+fmt <- function(x, d = 2) ifelse(is.na(x), "n.d.", formatC(x, format = "f", digits = d, big.mark = " ", decimal.mark = ","))
+pct <- function(x, d = 0) paste0(fmt(100 * x, d), " %")
+liste <- function(x) {
+  x <- unique(na.omit(as.character(x)))
+  if (length(x) == 0) return("aucune")
+  if (length(x) == 1) return(x)
+  paste(paste(head(x, -1), collapse = ", "), "et", tail(x, 1))
+}
+# Image : figure de l'analyse (nom court) ou schéma de la présentation (images/)
+fig <- function(nom) {
+  f <- chemin_fig(nom)
+  if (file.exists(f)) knitr::include_graphics(normalizePath(f))
+  else knitr::asis_output(paste0("*Figure « ", nom, " » absente : relancer le script d'analyse.*"))
+}
+img <- function(desc) {
+  f <- here::here("05_interpretation", "images", nf("05_interpretation", "analyst", desc, "png"))
+  if (file.exists(f)) knitr::include_graphics(normalizePath(f))
+  else knitr::asis_output(paste0("*Image « ", basename(f), " » à placer dans 05_interpretation/images/.*"))
+}
+tab <- function(d) knitr::kable(d, format.args = list(decimal.mark = ",", big.mark = " "))
+
+reg  <- R$imde_regions |> filter(!is.na(imde)) |> arrange(rang)
+prov <- if (!is.null(R$provinces) && nrow(R$provinces) > 0) arrange(R$provinces, rang) else tibble()
+tend <- if (!is.null(R$tendances)) R$tendances else tibble()
+conv <- R$convergence |> filter(!is.na(cv_tbs_prim)) |> arrange(annee)
+
+annee_ref  <- reg$annee[1]
+top3       <- head(reg, 3)
+cor_acp    <- suppressWarnings(cor(reg$imde, reg$imde_acp, method = "spearman", use = "complete.obs"))
+prov_prio  <- if (nrow(prov)) filter(prov, coalesce(prioritaire, FALSE)) else tibble()
+prov_poche <- if (nrow(prov)) filter(prov, coalesce(poche_cachee, FALSE)) else tibble()
+tend_plus  <- if (nrow(tend)) filter(tend, pente_imde > 0) else tibble()
+tbs        <- reg |> filter(!is.na(tbs_prim_T)) |> arrange(tbs_prim_T)
+
+titre_prio <- if (nrow(prov)) paste0("Où agir : ", nrow(prov_prio), " provinces prioritaires",
+                                     if (nrow(prov_poche)) paste0(", dont ", nrow(prov_poche), " cachées") else "") else "Où agir en priorité"
+
+titre_evo <- if (nrow(conv) >= 2) {
+  if (last(conv$cv_tbs_prim) > first(conv$cv_tbs_prim)) "Depuis 2016, les régions s'éloignent les unes des autres"
+  else "Depuis 2016, les régions se rapprochent, mais lentement"
+} else "Comment les écarts évoluent depuis 2016"
+```
+
+# 1 · Le problème et notre réponse
+
+::: notes
+5 s. Annoncer le plan en trois temps : le problème, la solution en action, les choix techniques.
+:::
+
+## Les moyennes nationales cachent des fractures profondes
+
+:::: {.columns}
+::: {.column width="58%"}
+```{r probleme}
+img("probleme-tbs")
+```
+:::
+::: {.column width="42%"}
+- Au primaire, **26,7 %** dans le Sahel contre **104,7 %** dans le Plateau-Central
+- L'accès s'effondre après le primaire, d'abord dans les zones touchées par l'insécurité
+- Genre, territoire et déplacement sont publiés **séparément**, et seulement par région
+:::
+::::
+
+::: notes
+1 min 30. Problème : une moyenne nationale de 78 % au primaire paraît correcte, mais elle cache des régions où l'école n'atteint qu'un enfant sur quatre, et un effondrement au secondaire. Les décideurs disposent de tableaux séparés (genre, région, insécurité) et à l'échelle régionale : impossible de savoir où agir en premier. Source des chiffres : fiches régionales INSD 2025.
+:::
+
+## Notre réponse : dire où agir, et comment
+
+- **Un indice unique, l'IMDE**, qui combine trois dimensions : l'écart filles-garçons, l'accès à l'école et les moyens (dont le déplacement forcé)
+- **Une carte jusqu'à la province**, qui révèle les zones que la moyenne régionale masque
+- **Une typologie** qui relie chaque zone à un type de réponse publique
+- **Un outil en ligne**, mis à jour chaque année à partir des annuaires
+
+::: notes
+1 min. Une phrase par point, sans entrer dans la méthode. Message pour l'équipe métier : la solution répond à la question « où mettre la prochaine école, la prochaine cantine, la prochaine bourse ».
+:::
+
+## Comment ça marche, en une image
+
+```{r methode}
+img("schema-methode")
+```
+
+::: notes
+1 min 15. Expliquer comme un bulletin scolaire : chaque indicateur devient une note de 0 à 1 (0 = la zone la plus favorable), on fait la moyenne par matière (genre, accès, moyens), puis la moyenne générale : l'IMDE. On vérifie ensuite que le classement ne dépend pas des poids choisis, et on regarde quel type d'inégalité domine dans chaque zone.
+:::
+
+# 2 · La solution en action
+
+::: notes
+5 s.
+:::
+
+## Ce que révèlent les données
+
+```{r messages, results = "asis"}
+m <- c()
+if (nrow(top3)) m <- c(m, paste0("Les écarts se concentrent dans **", liste(top3$nom), "**"))
+if (nrow(tbs) > 1) m <- c(m, paste0("Un rapport de **1 à ", fmt(tail(tbs$tbs_prim_T, 1) / tbs$tbs_prim_T[1], 1),
+                                    "** entre régions au primaire (", fmt(tbs$tbs_prim_T[1], 1), " % à ",
+                                    fmt(tail(tbs$tbs_prim_T, 1), 1), " %)"))
+if (nrow(prov)) m <- c(m, paste0("**", nrow(prov_prio), " provinces prioritaires**",
+                                 if (nrow(prov_poche)) paste0(", dont **", nrow(prov_poche), " invisibles** dans une lecture régionale") else ""))
+if (nrow(tend)) m <- c(m, paste0("Les écarts se creusent dans **", nrow(tend_plus), " région(s) sur ", nrow(tend), "**"))
+cat(paste0(seq_along(m), ". ", m, collapse = "\n"), "\n")
+```
+
+::: notes
+1 min 30. C'est la diapositive à retenir. Lire lentement les quatre résultats. Préciser l'année : régions `r annee_ref`, provinces 2025.
+:::
+
+## `r titre_prio`
+
+:::: {.columns}
+::: {.column width="58%"}
+```{r carte}
+fig("11_carte_imde_provinces")
+```
+:::
+::: {.column width="42%"}
+```{r top-prov}
+# 5 premières provinces + toutes les poches cachées (au plus 8 lignes pour tenir sur la diapositive)
+if (nrow(prov)) {
+  bind_rows(head(prov, 5), prov_poche) |> distinct(admin2_pcode, .keep_all = TRUE) |> arrange(rang) |> head(8) |>
+    transmute(Province = province, Région = region, IMDE = round(imde, 2),
+              `Cachée` = if_else(coalesce(poche_cachee, FALSE), "oui", "")) |>
+    tab()
+}
+```
+:::
+::::
+
+::: notes
+1 min 30. Contour rouge : les 20 % de provinces les plus inégales. Colonne « Cachée » : `r liste(prov_poche$province)`. Les poches cachées sont des provinces très inégales dans des régions qui ne le sont pas : une allocation des moyens par région passerait à côté. C'est l'apport principal de la désagrégation.
+:::
+
+## Chaque type d'inégalité appelle une réponse différente
+
+```{r typo, results = "asis"}
+reco <- c(
+  "Cumul : exclusion générale + filles désavantagées" = "Programme intégré : écoles, cantines, bourses pour les filles",
+  "Exclusion générale (tous les enfants)"             = "Offre et maintien : écoles, accueil des élèves déplacés, enseignants",
+  "Filles désavantagées"                              = "Mesures ciblées : bourses, latrines séparées, maintien après le CM2",
+  "Garçons désavantagés"                              = "Prévention du décrochage des garçons",
+  "Écarts modérés"                                    = "Suivi annuel")
+base <- if (nrow(prov_prio)) prov_prio |> transmute(zone = province, typologie) else top3 |> transmute(zone = nom, typologie)
+t <- tibble(Type = names(reco), Réponse = unname(reco)) |>
+  mutate(Zones = map_chr(Type, \(x) liste(head(base$zone[base$typologie == x], 4)))) |>
+  filter(Zones != "aucune")
+cat(paste(tab(t), collapse = "\n"), "\n")
+```
+
+::: notes
+1 min. Message pour l'équipe métier : deux zones au même score peuvent cacher des réalités opposées, des filles exclues ou tous les enfants exclus. Les réponses budgétaires ne sont pas les mêmes. Zones listées : provinces prioritaires.
+:::
+
+## Démonstration : l'application en ligne
+
+:::: {.columns}
+::: {.column width="62%"}
+```{r capture}
+img("capture-application")
+```
+:::
+::: {.column width="38%"}
+1. Choisir le niveau : régions, provinces ou communes
+2. Changer les priorités : la carte se recalcule
+3. Cliquer sur une zone : sa fiche s'affiche
+:::
+::::
+
+::: notes
+2 min. Démonstration en direct si la connexion le permet, sinon commenter la capture. Montrer seulement trois gestes : passer aux provinces, pousser le curseur « genre », cliquer sur une province prioritaire. Ne pas explorer davantage.
+:::
+
+## `r titre_evo`
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r nat}
+fig("04_parite_nationale")
+```
+:::
+::: {.column width="50%"}
+```{r evo}
+fig("06_trajectoires_imde")
+```
+:::
+::::
+
+::: notes
+1 min. À gauche, la parité filles-garçons nationale par niveau. À droite, l'inégalité de chaque région dans le temps ; en couleur, les régions où elle augmente le plus. Tendances testées par la pente de Sen et le test de Mann-Kendall, adaptés aux séries de 10 ans.
+:::
+
+# 3 · Choix techniques, mise en production, passage à l'échelle
+
+::: notes
+5 s.
+:::
+
+## Nos choix techniques, et pourquoi
+
+| Choix | Pourquoi |
+|---|---|
+| Données officielles uniquement (DGESS, INSD, CONASUR) | Résultats vérifiables et acceptables par l'administration |
+| Méthode standard des indices composites (OCDE-JRC, PNUD) | Pas de « boîte noire » : chaque score se décompose |
+| Robustesse testée : 2 000 pondérations et ACP | Le classement ne dépend pas de nos choix (corrélation de rang : `r fmt(cor_acp)`) |
+| R, Shiny et Quarto, logiciels libres | Aucune licence, code réutilisable par les équipes statistiques |
+| Chaîne en 5 étapes, une seule commande | Tout est rejouable et contrôlé à chaque étape |
+
+::: notes
+45 s. Pour l'équipe technique : le détail des formules et des tests est en annexe, à montrer pendant les questions.
+:::
+
+## Mise en production : une mise à jour par an
+
+```{r production}
+img("schema-production")
+```
+
+::: notes
+1 min. Aujourd'hui : application publiée sur Posit Connect Cloud. Pour le ministère : la même application peut tourner sur un serveur interne (Shiny Server, logiciel libre). Chaque année, il suffit de déposer le nouvel annuaire et de relancer la chaîne : les cartes et l'application se mettent à jour.
+:::
+
+## Passage à l'échelle : la même méthode, plus loin
+
+```{r echelle}
+img("schema-echelle")
+```
+
+::: notes
+45 s. Plus fin : les taux communaux du recensement 2019 sont déjà collectés ; avec l'enquête EHCVM, une estimation sur petits domaines (Fay-Herriot) donnera des résultats par commune. Plus large : la méthode ne dépend pas du secteur, elle s'applique à la santé ou à la protection sociale. Les volumes de données sont faibles : aucun besoin d'infrastructure lourde.
+:::
+
+## Ce que nous proposons
+
+```{r conclusion, results = "asis"}
+cat(if (nrow(top3)) paste0("**Agir d'abord dans ", liste(top3$nom), ", et dans les provinces prioritaires.**\n\n") else "")
+```
+
+1. **Adopter l'IMDE** comme indicateur de suivi annuel des inégalités d'accès
+2. **Ouvrir l'accès aux annuaires communaux** pour descendre à la commune
+3. **Tester l'outil avec une direction régionale** dès la prochaine rentrée
+
+::: notes
+45 s. Conclure sur la phrase en gras, puis les trois propositions. Remercier et ouvrir aux questions.
+:::
+
+# Annexes pour les questions
+
+::: notes
+Ne pas présenter. Diapositives à ouvrir seulement si le jury pose la question.
+:::
+
+## Le classement est solide
+
+:::: {.columns}
+::: {.column width="58%"}
+```{r rang}
+fig("02_classement_imde_sensibilite")
+```
+:::
+::: {.column width="42%"}
+```{r tab-rang}
+reg |> head(6) |>
+  transmute(Région = nom, Rang = rang, `Rang possible` = paste0(round(rang_p05), "-", round(rang_p95))) |>
+  tab()
+```
+:::
+::::
+
+## Les écarts filles-garçons grandissent avec le niveau
+
+```{r ecarts}
+fig("01_tableau_ecarts_genre")
+```
+
+## Ville-campagne : la dynamique des effectifs
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r mil1}
+fig("08_effectifs_urbain_rural")
+```
+:::
+::: {.column width="50%"}
+```{r mil2}
+fig("09_part_filles_milieu")
+```
+:::
+::::
+
+## Formules de l'IMDE
+
+- **Écart de parité** : g = | ln(IPS) |, avec IPS = taux des filles / taux des garçons
+- **Déficit d'accès** : a = 1 − min(TBS ; 100) / 100
+- **Normalisation** : s = (x − minimum) / (maximum − minimum), calculée sur l'ensemble des zones
+- **Dimension** : moyenne des s de ses indicateurs (genre, accès, moyens)
+- **IMDE** : moyenne des trois dimensions, de 0 (zone la moins inégale) à 1 (la plus inégale)
+- **Robustesse** : 2 000 pondérations tirées selon une loi de Dirichlet ; pondération par ACP en contrôle
+
+## Fondements scientifiques
+
+| Étape | Référence |
+|---|---|
+| Indice composite | OCDE et JRC (2008), *Handbook on Constructing Composite Indicators* |
+| Normalisation, dimensions | PNUD, notes techniques de l'IDH ; Alkire et Foster (2011) |
+| Parité filles-garçons | UNESCO-ISU, indicateur 4.5.1 de l'ODD 4 |
+| Robustesse | Saisana, Saltelli et Tarantola (2005), *JRSS Series A* |
+| Tendances | Sen (1968) ; Mann (1945) ; Kendall (1975) |
+| Convergence | Barro et Sala-i-Martin (1992) |
+
+## Limites assumées
+
+- Indice relatif : 0 désigne la zone la moins inégale, pas une zone sans inégalité
+- Taux dépendants des projections de population
+- Écart ville-campagne mesuré en effectifs, faute de population par milieu
+- Zones d'insécurité moins bien renseignées : inégalités probablement sous-estimées
+- Indice descriptif : il localise les inégalités, il ne les explique pas

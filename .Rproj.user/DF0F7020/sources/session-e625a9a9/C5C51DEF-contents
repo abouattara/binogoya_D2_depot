@@ -1,0 +1,238 @@
+# =============================================================================
+# 04 ANALYSE - Diagnostic : pourquoi des provinces sont grises sur la carte de l'IMDE
+#
+# Deux causes possibles, que ce script sépare :
+#   A. l'IMDE n'est pas calculé pour la province (problème de données ou de calcul) ;
+#   B. l'IMDE est calculé, mais le polygone du fond de carte ne trouve pas sa province
+#      dans les résultats (Pcodes différents : problème de shapefile ou de découpage) ;
+#   C. le Pcode est le même, mais il désigne une autre province (découpage modifié).
+#
+# Prérequis : 04_analyse/binogoya_04-analyse_D2_analyst_ecarts-education_v1.R exécuté.
+# Lancement (depuis le projet binogoya_D2_depot.Rproj) :
+#   source("04_analyse/binogoya_04-analyse_D2_analyst_diagnostic-carte-provinces_v1.R")
+#
+# Sorties :
+#   04_analyse/sorties/binogoya_04-analyse_D2_analyst_diagnostic-carte-provinces_v1.txt  (rapport)
+#   04_analyse/sorties/figures/binogoya_04-analyse_D2_analyst_fig99-diagnostic-appariement-provinces_v1.png
+#   Data/shapefile/binogoya_04-analyse_D2_analyst_correspondance-provinces-proposition_v1.csv
+#     -> à vérifier dans Excel, puis à enregistrer sous le nom
+#        binogoya_04-analyse_D2_analyst_correspondance-provinces_v1.csv (sans « -proposition ») :
+#        cette table validée est ensuite lue par l'analyse et par l'application.
+# =============================================================================
+
+source(here::here("binogoya_00-config_D2_engineer_chemins_v1.R"))
+installer(c("sf", "dplyr", "purrr", "stringr", "stringi", "ggplot2", "tibble", "readr"))
+suppressPackageStartupMessages({
+  library(sf); library(dplyr); library(purrr); library(stringr)
+  library(stringi); library(ggplot2); library(tibble)
+})
+sf_use_s2(FALSE)
+
+f_rapport <- file.path(CH$sorties, nf("04_analyse", "analyst", "diagnostic-carte-provinces", "txt"))
+f_propose <- file.path(CH$shp, nf("04_analyse", "analyst", "correspondance-provinces-proposition", "csv"))
+f_valide  <- file.path(CH$shp, nf("04_analyse", "analyst", "correspondance-provinces", "csv"))
+f_carte   <- chemin_fig("99_diagnostic_appariement_provinces")
+
+norm_lib <- function(x) {
+  x |> as.character() |> stri_trans_general("Latin-ASCII") |> str_to_lower() |>
+    str_replace_all("[^a-z0-9]+", "")
+}
+cle_province <- function(x) sub("^les(?=[a-z]{3,})", "", norm_lib(x), perl = TRUE)
+titre <- function(x) cat("\n", strrep("=", 72), "\n", x, "\n", strrep("=", 72), "\n", sep = "")
+montrer <- function(d, n = 60) { if (nrow(d) == 0) cat("  (aucune)\n") else print(as.data.frame(head(d, n)), row.names = FALSE) }
+
+while (sink.number() > 0) sink()
+sink(f_rapport, split = TRUE)
+cat("Diagnostic de la carte provinciale de l'IMDE -", format(Sys.time(), "%Y-%m-%d %H:%M"), "\n")
+
+
+# -----------------------------------------------------------------------------
+# 1. Résultats : l'IMDE est-il calculé pour toutes les provinces ?  (cause A)
+# -----------------------------------------------------------------------------
+titre("1. Résultats provinciaux (fichier de résultats de l'analyse)")
+exiger(FIC$resultats_rds, "04_analyse/binogoya_04-analyse_D2_analyst_ecarts-education_v1.R")
+R <- readRDS(FIC$resultats_rds)
+prov <- R$provinces
+if (is.null(prov) || nrow(prov) == 0) stop("Aucun résultat provincial dans ", FIC$resultats_rds)
+prov <- as_tibble(prov)
+
+cat("Provinces dans les résultats :", nrow(prov), "\n")
+cat("IMDE calculé :", sum(!is.na(prov$imde)), " | IMDE manquant :", sum(is.na(prov$imde)), "\n")
+cat("Pcodes manquants :", sum(is.na(prov$admin2_pcode)),
+    " | Pcodes en double :", sum(duplicated(na.omit(prov$admin2_pcode))), "\n")
+cat("Format des Pcodes (exemples) :", paste(head(prov$admin2_pcode, 5), collapse = ", "), "\n")
+cat("\nProvinces sans IMDE (cause A) :\n")
+montrer(prov |> filter(is.na(imde)) |>
+          select(any_of(c("admin2_pcode", "province", "region", "genre", "acces", "contexte"))))
+
+
+# -----------------------------------------------------------------------------
+# 2. Fond de carte : quelles couches, quel découpage ?
+# -----------------------------------------------------------------------------
+titre("2. Fond de carte (Data/shapefile/admin_boundaries)")
+f_shp <- list.files(CH$shp_admin, "\\.shp$", recursive = TRUE, full.names = TRUE)
+if (length(f_shp) == 0) {
+  sink()
+  stop("Aucun .shp dans ", CH$shp_admin, " : lancez 01_collecte/binogoya_01-collecte_D2_engineer_geo-extraction_v1.R")
+}
+inventaire <- map_dfr(f_shp, \(p) {
+  x <- tryCatch(st_read(p, quiet = TRUE), error = \(e) NULL)
+  if (is.null(x)) return(tibble(fichier = basename(p), n = NA_integer_, geometrie = "ERREUR DE LECTURE", crs = NA_character_))
+  tibble(fichier = basename(p), n = nrow(x),
+         geometrie = paste(unique(as.character(st_geometry_type(x))), collapse = "/"),
+         crs = if (is.na(st_crs(x))) "aucun" else as.character(st_crs(x)$input))
+})
+montrer(inventaire)
+
+couches <- map(f_shp, \(p) tryCatch({
+  x <- st_read(p, quiet = TRUE)
+  if (!all(as.character(st_geometry_type(x)) %in% c("POLYGON", "MULTIPOLYGON"))) return(NULL)
+  d <- st_drop_geometry(x); names(d) <- make.unique(tolower(names(d)), sep = "_")
+  st_sf(d, geometry = st_geometry(x))
+}, error = \(e) NULL)) |> set_names(basename(f_shp)) |> compact()
+
+i_prov <- which(map_lgl(couches, \(x) "adm2_pcode" %in% names(x) && !"adm3_pcode" %in% names(x)))
+if (length(i_prov) == 0) {
+  sink()
+  stop("Aucune couche de polygones avec adm2_pcode (et sans adm3_pcode) : vérifiez l'archive OCHA.")
+}
+shp <- couches[[i_prov[1]]]
+cat("\nCouche provinces retenue :", names(couches)[i_prov[1]], "\n")
+cat("Colonnes :", paste(setdiff(names(shp), "geometry"), collapse = ", "), "\n")
+
+nc <- intersect(c("adm2_fr", "adm2_name1", "adm2_name"), names(shp))[1]
+shp$nom_shp <- if (!is.na(nc)) as.character(shp[[nc]]) else shp$adm2_pcode
+cat("Polygones :", nrow(shp), " | Pcodes distincts :", n_distinct(shp$adm2_pcode),
+    " | Pcodes manquants :", sum(is.na(shp$adm2_pcode)), "\n")
+cat("Géométries invalides :", sum(!st_is_valid(shp), na.rm = TRUE),
+    " | géométries vides :", sum(st_is_empty(shp)), "\n")
+cat("Système de coordonnées :", if (is.na(st_crs(shp))) "aucun (à fixer en 4326)" else st_crs(shp)$input, "\n")
+
+col_reg <- intersect(c("adm1_fr", "adm1_name", "adm1_name1"), names(shp))[1]
+n_reg_shp <- if (!is.na(col_reg)) n_distinct(shp[[col_reg]]) else NA
+if (!is.na(col_reg)) {
+  cat("Régions dans la couche :", n_reg_shp,
+      if (n_reg_shp == 17) "-> NOUVEAU découpage (17 régions, 2025)" else if (n_reg_shp == 13) "-> ancien découpage (13 régions)" else "", "\n")
+  cat("Liste :", paste(sort(unique(shp[[col_reg]])), collapse = ", "), "\n")
+}
+cat("Comparaison : ", nrow(shp), " polygones contre ", nrow(prov), " provinces dans les résultats\n", sep = "")
+
+
+# -----------------------------------------------------------------------------
+# 3. Appariement par Pcode  (cause B)
+# -----------------------------------------------------------------------------
+titre("3. Appariement par Pcode")
+ok_pcode <- shp$adm2_pcode %in% prov$admin2_pcode
+cat("Polygones appariés par Pcode :", sum(ok_pcode), "sur", nrow(shp), "\n")
+cat("Provinces des résultats sans polygone :", sum(!prov$admin2_pcode %in% shp$adm2_pcode), "\n")
+
+cat("\nPréfixes régionaux des Pcodes (4 premiers caractères) :\n")
+pref <- full_join(count(st_drop_geometry(shp), prefixe = substr(adm2_pcode, 1, 4), name = "fond_de_carte"),
+                  count(prov, prefixe = substr(admin2_pcode, 1, 4), name = "resultats"), by = "prefixe") |>
+  arrange(prefixe)
+montrer(pref)
+
+cat("\nPolygones sans Pcode commun avec les résultats :\n")
+montrer(st_drop_geometry(shp) |> filter(!ok_pcode) |> select(adm2_pcode, nom_shp, any_of(col_reg)))
+cat("\nProvinces des résultats sans polygone :\n")
+montrer(prov |> filter(!admin2_pcode %in% shp$adm2_pcode) |>
+          select(any_of(c("admin2_pcode", "province", "region", "imde", "rang"))))
+
+
+# -----------------------------------------------------------------------------
+# 4. Vérification des noms et propositions de correspondance  (causes B et C)
+# -----------------------------------------------------------------------------
+titre("4. Noms : contrôle des appariements et propositions")
+k_shp <- cle_province(shp$nom_shp)
+k_res <- cle_province(prov$province)
+D <- adist(k_shp, k_res)                      # distance d'édition entre noms normalisés
+
+corresp <- map_dfr(seq_len(nrow(shp)), \(i) {
+  j_pc <- match(shp$adm2_pcode[i], prov$admin2_pcode)
+  j_nm <- which(k_res == k_shp[i])
+  j_pr <- which.min(D[i, ])
+  if (!is.na(j_pc)) {
+    d <- D[i, j_pc]
+    tibble(methode = if (isTRUE(d <= 2)) "pcode" else "pcode, NOMS DIFFÉRENTS (cause C ?)", j = j_pc, distance = d)
+  } else if (length(j_nm) == 1) {
+    tibble(methode = "nom identique", j = j_nm, distance = 0)
+  } else if (D[i, j_pr] <= max(2, round(0.25 * nchar(k_shp[i])))) {
+    tibble(methode = "nom proche (à vérifier)", j = j_pr, distance = D[i, j_pr])
+  } else {
+    tibble(methode = "aucune correspondance", j = j_pr, distance = D[i, j_pr])
+  }
+}) |>
+  mutate(adm2_pcode_shp = shp$adm2_pcode, nom_shp = shp$nom_shp,
+         region_shp = if (!is.na(col_reg)) as.character(shp[[col_reg]]) else NA_character_,
+         admin2_pcode_res = if_else(methode == "aucune correspondance", NA_character_, prov$admin2_pcode[j]),
+         province_res = prov$province[j],
+         candidat_le_plus_proche = prov$province[j],
+         imde_res = round(prov$imde[j], 3)) |>
+  mutate(province_res = if_else(is.na(admin2_pcode_res), NA_character_, province_res))
+
+# Une province des résultats attribuée à plusieurs polygones = province scindée par le découpage
+dbl <- corresp |> filter(!is.na(admin2_pcode_res)) |> count(admin2_pcode_res) |> filter(n > 1)
+corresp <- corresp |>
+  mutate(a_verifier = methode != "pcode" | admin2_pcode_res %in% dbl$admin2_pcode_res,
+         note = case_when(admin2_pcode_res %in% dbl$admin2_pcode_res ~ "province attribuée à plusieurs polygones (scission ?)",
+                          methode == "aucune correspondance" ~ "compléter admin2_pcode_res à la main",
+                          TRUE ~ "")) |>
+  select(adm2_pcode_shp, nom_shp, region_shp, admin2_pcode_res, province_res, methode, distance,
+         candidat_le_plus_proche, imde_res, a_verifier, note) |>
+  arrange(desc(a_verifier), methode, nom_shp)
+
+print(table(corresp$methode))
+cat("\nLignes à vérifier :\n")
+montrer(corresp |> filter(a_verifier) |> select(-region_shp))
+
+readr::write_excel_csv2(corresp, f_propose, na = "")
+cat("\nTable proposée :", f_propose, "\n")
+cat("-> Ouvrez-la dans Excel, corrigez la colonne admin2_pcode_res si besoin,\n",
+    "   puis enregistrez-la (format CSV point-virgule) sous :\n   ", f_valide, "\n", sep = "")
+
+
+# -----------------------------------------------------------------------------
+# 5. Carte de diagnostic
+# -----------------------------------------------------------------------------
+statut <- corresp |>
+  transmute(adm2_pcode = adm2_pcode_shp,
+            statut = case_when(
+              methode == "aucune correspondance" ~ "Non apparié",
+              is.na(imde_res) ~ "Apparié, IMDE manquant",
+              methode == "pcode" & !a_verifier ~ "Apparié par Pcode",
+              methode == "pcode" ~ "Pcode, à vérifier",
+              TRUE ~ "Apparié par le nom (à vérifier)"))
+carte <- shp |> left_join(distinct(statut, adm2_pcode, .keep_all = TRUE), by = "adm2_pcode")
+pal <- c("Apparié par Pcode" = "#9ec5f4", "Apparié par le nom (à vérifier)" = "#eda100",
+         "Pcode, à vérifier" = "#eb6834", "Apparié, IMDE manquant" = "#6250d6", "Non apparié" = "#d03b3b")
+p <- ggplot(carte) +
+  geom_sf(aes(fill = statut), colour = "white", linewidth = 0.3) +
+  geom_sf_text(aes(label = nom_shp), size = 2.2, colour = "#0b0b0b") +
+  scale_fill_manual(values = pal, name = NULL, drop = FALSE) +
+  labs(title = "Diagnostic : appariement fond de carte - résultats de l'IMDE",
+       subtitle = paste0(sum(ok_pcode), " polygones sur ", nrow(shp), " appariés par Pcode")) +
+  theme_void(base_size = 11) + theme(legend.position = "bottom")
+ggsave(f_carte, p, width = 9, height = 8, dpi = 150, bg = "white")
+cat("Carte de diagnostic :", f_carte, "\n")
+
+
+# -----------------------------------------------------------------------------
+# 6. Verdict
+# -----------------------------------------------------------------------------
+titre("6. Verdict")
+nA <- sum(is.na(prov$imde))
+nB <- sum(!ok_pcode)
+nB_nom <- sum(corresp$methode %in% c("nom identique", "nom proche (à vérifier)"))
+nC <- sum(grepl("NOMS DIFF", corresp$methode))
+if (nA > 0) cat("- CAUSE A :", nA, "province(s) sans IMDE : le problème est dans le calcul ou les données (section 1).\n")
+if (nB > 0) cat("- CAUSE B :", nB, "polygone(s) sans Pcode commun avec les résultats ;", nB_nom,
+                "récupérable(s) par le nom. C'est un problème de codification du fond de carte.\n")
+if (nC > 0) cat("- CAUSE C :", nC, "Pcode(s) identique(s) mais noms différents : le découpage a changé, vérifiez ces lignes.\n")
+if (!is.na(n_reg_shp) && n_reg_shp != 13)
+  cat("- Le fond de carte suit un découpage à", n_reg_shp, "régions ; les statistiques suivent les 13 anciennes régions.\n")
+if (nA == 0 && nB == 0 && nC == 0) cat("- Aucun problème d'appariement détecté : le gris vient d'ailleurs (palette, filtre).\n")
+cat("\nCorrection : valider la table de correspondance, puis relancer l'analyse (04) et\n",
+    "supprimer le cache de l'application : file.remove(FIC$cache_shiny)\n", sep = "")
+
+sink()
+message("Rapport écrit dans ", f_rapport)

@@ -1,0 +1,41 @@
+# Recherche et centralisation des données requis
+
+> Question à répondre : Ou les écarts d'accès qui sont les plus grandes et comment il évolue ?
+
+## Données Indispensables
+
+### Source : Données statistiques préscolaire et primaire 2016-2025 (source : DGESS, Ministère de l'Éducation nationale)
+
+| Niveau | Tableau | Usage |
+|---|---|---|
+| Préscolaire | T1 : effectifs par sexe et région | Part des filles et poids de chaque région, évolution |
+| Préscolaire | T3 : effectifs par sexe et milieu | Seule source du ville-campagne au préscolaire |
+| Préscolaire | T5 : TBS par sexe et région | Écarts d'accès entre régions |
+| Préscolaire | T6 : IPS du TBS par région | Écart filles-garçons, déjà calculé |
+| Primaire | T1 : effectifs par sexe et région | Base de recalcul et de contrôle des taux |
+| Primaire | T3 : effectifs par sexe et milieu | Seule source du ville-campagne au primaire |
+| Primaire | T5 : nouveaux inscrits au CP1 par sexe et région | Accès à l'entrée |
+| Primaire | T6 : TBA par sexe et région | Accès à l'entrée, par région |
+| Primaire | T7 : TBS par sexe et région | Accès global, par région |
+| Primaire | T10 : IPS du TBA | Parité à l'entrée |
+| Primaire | T11 : IPS du TBS | Parité de scolarisation |
+
+## Complémentaires (explicatifs, à utiliser avec parcimonie)
+
+- **Préscolaire T2 et primaire T2** (effectifs par statut) : montrent si l'écart public/privé accompagne l'écart d'accès.
+- **Préscolaire T7 et T8, primaire T13** (structures, salles, écoles par région) : mesurent l'offre scolaire, qui aide à interpréter un écart régional sans entrer dans le décrochage.
+
+
+## Trois limites à connaître avant d'écrire
+
+1. **Le milieu n'existe qu'en effectifs** (T3 de chaque niveau). Il n'y a ni TBS ni TBA par milieu. Sans population par milieu venant de l'INSD, l'écart ville-campagne ne peut s'exprimer qu'en parts d'effectifs et en indices d'évolution (base 100 en 2015/2016), pas en taux. Un TBS urbain/rural exige ces dénominateurs externes.
+2. **La région est le niveau le plus fin.** Le milieu semble national, sans croisement région × milieu. La « localisation » du défi se fait donc à l'échelle des régions, et l'ambition communale de notre note doit disparaître.
+3. **Les données administratives sont exhaustives**, donc sans bruit d'échantillonnage. L'incertitude vient plutôt des projections de population utilisées pour les taux. Prévoyez un test de sensibilité sur ces dénominateurs, et vérifiez la série autour de 2019/2020 : un changement de base de projection peut créer une fausse rupture.
+
+## Ce que cela change dans la note
+
+- **Types de données à cocher** : effectifs scolaires, infrastructures et équipements, données démographiques, données géographiques. Décochez **résultats d'examens** (le CEP est écarté) et **personnel enseignant** (aucun tableau).
+- **Niveaux** : préscolaire et primaire uniquement.
+- **Analyse centrale** : écarts régionaux du TBA et du TBS, IPS dans le temps, ville-campagne par parts d'effectifs, et une analyse de convergence (les écarts entre régions se réduisent-ils ?).
+
+Le Tableau 5 du primaire apparaît deux fois dans votre liste, et « Feuill18 » du Tableau 8 est sans doute « Feuill8 ». Vérifiez-le dans le fichier. Je peux ensuite réécrire la note complète autour de ces 11 tableaux.

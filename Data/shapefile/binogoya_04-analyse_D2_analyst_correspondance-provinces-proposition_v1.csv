@@ -1,0 +1,48 @@
+﻿adm2_pcode_shp;nom_shp;region_shp;admin2_pcode_res;province_res;methode;distance;candidat_le_plus_proche;imde_res;a_verifier;note
+BF5901;Djelgodji;Soum;BF5603;Soum;aucune correspondance;6;Boulgou;0,174;TRUE;compléter admin2_pcode_res à la main
+BF6001;Dyamongou;Tapoa;;;aucune correspondance;5;Yatenga;0,347;TRUE;compléter admin2_pcode_res à la main
+BF6002;Gobnangou;Tapoa;BF5205;Tapoa;aucune correspondance;5;Gnagna;0,491;TRUE;compléter admin2_pcode_res à la main
+BF5902;Karo-Peli;Soum;;;aucune correspondance;5;Kossi;0,534;TRUE;compléter admin2_pcode_res à la main
+BF6201;Balé;Bankui;BF4601;Bale;nom identique;0;Bale;0,313;TRUE;
+BF6202;Banwa;Bankui;BF4602;Banwa;nom identique;0;Banwa;0,442;TRUE;
+BF5801;Gnagna;Sirba;BF5201;Gnagna;nom identique;0;Gnagna;0,491;TRUE;
+BF6301;Gourma;Goulmou;BF5202;Gourma;nom identique;0;Gourma;0,413;TRUE;
+BF6302;Kompienga;Goulmou;BF5204;Kompienga;nom identique;0;Kompienga;0,714;TRUE;
+BF6203;Mouhoun;Bankui;BF4604;Mouhoun;nom identique;0;Mouhoun;0,202;TRUE;
+BF6102;Nayala;Sourou;BF4605;Nayala;nom identique;0;Nayala;0,271;TRUE;
+BF6401;Oudalan;Liptako;BF5601;Oudalan;nom identique;0;Oudalan;0,614;TRUE;
+BF6103;Sourou;Sourou;BF4606;Sourou;nom identique;0;Sourou;0,572;TRUE;
+BF6402;Séno;Liptako;BF5602;Seno;nom identique;0;Seno;0,637;TRUE;
+BF6403;Yagha;Liptako;BF5604;Yagha;nom identique;0;Yagha;0,686;TRUE;
+BF5802;Komandjari;Sirba;BF5203;Komondjari;nom proche (à vérifier);1;Komondjari;0,526;TRUE;
+BF6101;Kossin;Sourou;BF4603;Kossi;nom proche (à vérifier);1;Kossi;0,534;TRUE;
+BF5503;Bassitenga;Oubri;BF5503;Oubritenga;pcode, NOMS DIFFÉRENTS (cause C ?);4;Oubritenga;0,261;TRUE;
+BF4903;Sandbondtenga;Koulse;BF4903;Sanmatenga;pcode, NOMS DIFFÉRENTS (cause C ?);5;Sanmatenga;0,425;TRUE;
+BF4901;Bam;Koulse;BF4901;Bam;pcode;0;Bam;0,438;FALSE;
+BF5101;Bazèga;Nazinon;BF5101;Bazega;pcode;0;Bazega;0,065;FALSE;
+BF5701;Bougouriba;Djoro;BF5701;Bougouriba;pcode;0;Bougouriba;0,255;FALSE;
+BF4801;Boulgou;Nakambe;BF4801;Boulgou;pcode;0;Boulgou;0,174;FALSE;
+BF5001;Boulkiemdé;Nando;BF5001;Boulkiemde;pcode;0;Boulkiemde;0,136;FALSE;
+BF4701;Comoé;Tannounyan;BF4701;Comoe;pcode;0;Comoe;0,362;FALSE;
+BF5501;Ganzourgou;Oubri;BF5501;Ganzourgou;pcode;0;Ganzourgou;0,245;FALSE;
+BF5301;Houet;Guiriko;BF5301;Houet;pcode;0;Houet;0,27;FALSE;
+BF5702;Ioba;Djoro;BF5702;Ioba;pcode;0;Ioba;0,183;FALSE;
+BF1300;Kadiogo;Kadiogo;BF1300;Kadiogo;pcode;0;Kadiogo;0,251;FALSE;
+BF4802;Koulpélogo;Nakambe;BF4802;Koulpelogo;pcode;0;Koulpelogo;0,694;FALSE;
+BF4803;Kourittenga;Nakambe;BF4803;Kouritenga;pcode;1;Kouritenga;0,275;FALSE;
+BF5502;Kourwéogo;Oubri;BF5502;Kourweogo;pcode;0;Kourweogo;0,157;FALSE;
+BF5302;Kénédougou;Guiriko;BF5302;Kenedougou;pcode;0;Kenedougou;0,203;FALSE;
+BF5401;Loroum;Yaadga;BF5401;Loroum;pcode;0;Loroum;0,257;FALSE;
+BF4702;Léraba;Tannounyan;BF4702;Leraba;pcode;0;Leraba;0,178;FALSE;
+BF5102;Nahouri;Nazinon;BF5102;Nahouri;pcode;0;Nahouri;0,112;FALSE;
+BF4902;Namentenga;Koulse;BF4902;Namentenga;pcode;0;Namentenga;0,584;FALSE;
+BF5703;Noumbiel;Djoro;BF5703;Noumbiel;pcode;0;Noumbiel;0,306;FALSE;
+BF5402;Passoré;Yaadga;BF5402;Passore;pcode;0;Passore;0,356;FALSE;
+BF5704;Poni;Djoro;BF5704;Poni;pcode;0;Poni;0,359;FALSE;
+BF5002;Sanguié;Nando;BF5002;Sanguie;pcode;0;Sanguie;0,282;FALSE;
+BF5003;Sissili;Nando;BF5003;Sissili;pcode;0;Sissili;0,265;FALSE;
+BF5303;Tuy;Guiriko;BF5303;Tuy;pcode;0;Tuy;0,216;FALSE;
+BF5403;Yatenga;Yaadga;BF5403;Yatenga;pcode;0;Yatenga;0,347;FALSE;
+BF5004;Ziro;Nando;BF5004;Ziro;pcode;0;Ziro;0,288;FALSE;
+BF5404;Zondoma;Yaadga;BF5404;Zondoma;pcode;0;Zondoma;0,064;FALSE;
+BF5103;Zoundwéogo;Nazinon;BF5103;Zoundweogo;pcode;0;Zoundweogo;0,125;FALSE;
